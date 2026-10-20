@@ -4,7 +4,10 @@ Small, kid-friendly web apps that work offline and can be installed on a phone
 or tablet like a regular app (PWAs). Each app is plain HTML, CSS and
 JavaScript with no build step.
 
-Live site: `https://<owner>.github.io/kids-corner/`
+Live site: <https://axlgrey.github.io/kids-corner/>
+
+- Color Fun!: <https://axlgrey.github.io/kids-corner/k-color/src/>
+- Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 
 ## Apps
 
@@ -79,9 +82,3 @@ python -m http.server 8000
 ```
 
 Then open `http://localhost:8000/`.
-
-## Deployment
-
-Every push to `main` publishes the repository to GitHub Pages through
-`.github/workflows/pages.yml`. In the repository settings, set
-**Settings → Pages → Source** to **GitHub Actions** once.
