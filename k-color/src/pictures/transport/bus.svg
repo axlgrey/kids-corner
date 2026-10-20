@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <circle cx="28" cy="26" r="14"/>
+  <path d="M130 28 Q130 16 142 18 Q148 8 160 13 Q174 9 176 22 Q188 24 183 34 L134 34 Q124 34 130 28 Z"/>
+  <!-- trees -->
+  <rect x="8" y="132" width="8" height="30"/>
+  <circle cx="12" cy="124" r="14"/>
+  <rect x="184" y="132" width="8" height="30"/>
+  <circle cx="188" cy="124" r="14"/>
+  <!-- road -->
+  <rect x="0" y="164" width="200" height="36"/>
+  <rect x="24" y="184" width="28" height="5" rx="2"/>
+  <rect x="148" y="184" width="28" height="5" rx="2"/>
+  <!-- bus body -->
+  <path d="M26 160 L26 70 Q26 44 60 44 L140 44 Q174 44 174 70 L174 160 Z"/>
+  <!-- sign -->
+  <rect x="72" y="50" width="56" height="14" rx="5"/>
+  <!-- windshield -->
+  <path d="M40 72 Q40 68 46 68 L154 68 Q160 68 160 72 L160 106 L40 106 Z"/>
+  <path class="n" d="M100 68 L100 106"/>
+  <!-- headlights -->
+  <circle cx="50" cy="128" r="10"/>
+  <circle cx="150" cy="128" r="10"/>
+  <!-- grille -->
+  <rect x="72" y="118" width="56" height="20" rx="6"/>
+  <path class="n" stroke-width="2" d="M72 125 L128 125 M72 131 L128 131"/>
+  <!-- bumper -->
+  <rect x="20" y="146" width="160" height="14" rx="7"/>
+  <!-- mirrors -->
+  <path d="M26 74 L14 70 L14 92 L26 90 Z"/>
+  <path d="M174 74 L186 70 L186 92 L174 90 Z"/>
+  <!-- wheels -->
+  <rect x="40" y="158" width="28" height="16" rx="6"/>
+  <rect x="132" y="158" width="28" height="16" rx="6"/>
+</svg>

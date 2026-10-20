@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- table -->
+  <path d="M0 168 L200 168 L200 200 L0 200 Z"/>
+  <path class="n" stroke-width="2" d="M0 176 L200 176"/>
+  <!-- tablecloth checks -->
+  <rect x="10" y="180" width="16" height="10"/>
+  <rect x="58" y="180" width="16" height="10"/>
+  <rect x="106" y="180" width="16" height="10"/>
+  <rect x="154" y="180" width="16" height="10"/>
+  <!-- plate -->
+  <ellipse cx="100" cy="170" rx="80" ry="12"/>
+  <ellipse cx="100" cy="168" rx="60" ry="7"/>
+  <!-- apple body -->
+  <path d="M100 56 Q62 30 34 64 Q14 104 44 146 Q66 176 100 162 Q134 176 156 146 Q186 104 166 64 Q138 30 100 56 Z"/>
+  <!-- shine -->
+  <path d="M52 78 Q60 64 72 62 Q62 74 58 92 Q52 90 52 78 Z"/>
+  <circle cx="56" cy="104" r="4"/>
+  <!-- stem -->
+  <path d="M96 58 Q94 36 106 18 L112 22 Q102 38 103 58 Z"/>
+  <!-- leaf -->
+  <path d="M108 36 Q130 8 158 22 Q136 48 108 36 Z"/>
+  <path class="n" stroke-width="2" d="M110 35 Q132 26 152 24"/>
+  <!-- worm -->
+  <circle cx="150" cy="96" r="9"/>
+  <path d="M156 102 Q172 106 176 96 Q180 86 172 82 Q168 92 160 94 Z"/>
+  <circle class="n" cx="147" cy="94" r="1.5"/>
+  <circle class="n" cx="153" cy="94" r="1.5"/>
+  <path class="n" stroke-width="2" d="M147 99 Q150 101 153 99"/>
+  <path class="n" stroke-width="2" d="M148 87 L146 80 M152 87 L154 80"/>
+  <!-- small apple slice -->
+  <path d="M168 168 Q170 146 190 150 Q192 166 168 168 Z"/>
+  <path d="M172 164 Q174 152 186 154 Q186 164 172 164 Z"/>
+</svg>

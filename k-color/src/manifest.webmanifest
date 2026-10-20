@@ -1,0 +1,16 @@
+{
+  "name": "Color Fun!",
+  "short_name": "Color Fun",
+  "description": "A kid-friendly coloring app. Pick a picture and tap to color.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff3c4",
+  "theme_color": "#ffb703",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

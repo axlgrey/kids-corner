@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#ffb703">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Color Fun">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Color Fun!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="home" class="screen active">
+    <header class="home-header">
+      <h1 class="title">🎨 Color Fun!</h1>
+      <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+    </header>
+    <nav id="categories" class="categories"></nav>
+    <div id="gallery" class="gallery"></div>
+  </section>
+
+  <section id="painter" class="screen">
+    <header class="toolbar">
+      <button id="backBtn" class="tool" aria-label="Back">⬅️</button>
+      <h2 id="pictureName"></h2>
+      <div class="tools">
+        <button id="undoBtn" class="tool" aria-label="Undo">↩️</button>
+        <button id="clearBtn" class="tool" aria-label="Start over">🗑️</button>
+        <button id="saveBtn" class="tool" aria-label="Save">💾</button>
+        <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+      </div>
+    </header>
+    <main class="canvas-wrap">
+      <div id="canvas" class="canvas"></div>
+    </main>
+    <footer id="palette" class="palette"></footer>
+  </section>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ New pictures are ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="catalog.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

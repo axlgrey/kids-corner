@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- desert sky -->
+  <circle cx="160" cy="34" r="18"/>
+  <path class="n" stroke-width="2" d="M160 6 L160 11 M160 57 L160 62 M132 34 L137 34 M183 34 L188 34"/>
+  <!-- dunes -->
+  <path d="M0 140 Q50 118 100 136 Q150 120 200 138 L200 170 L0 170 Z"/>
+  <path d="M0 164 Q100 152 200 164 L200 200 L0 200 Z"/>
+  <!-- small cactus -->
+  <rect x="20" y="128" width="14" height="40" rx="7"/>
+  <path d="M20 148 L12 148 Q8 148 8 144 L8 134 Q8 130 12 130 Q16 130 16 134 L16 142 L20 142 Z"/>
+  <!-- rocks -->
+  <path d="M150 176 Q160 160 176 168 Q186 172 184 180 L148 180 Z"/>
+  <!-- arms -->
+  <path d="M78 110 L58 110 Q46 110 46 98 L46 70 Q46 60 56 60 Q66 60 66 70 L66 92 L78 92 Z"/>
+  <path d="M122 96 L142 96 Q154 96 154 84 L154 50 Q154 40 144 40 Q134 40 134 50 L134 78 L122 78 Z"/>
+  <!-- body -->
+  <rect x="78" y="40" width="44" height="114" rx="22"/>
+  <path class="n" stroke-width="2" d="M92 52 L92 150 M108 52 L108 150"/>
+  <!-- spines -->
+  <path class="n" stroke-width="2" d="M78 64 L72 62 M78 124 L72 122 M122 112 L128 110 M122 136 L128 134 M46 82 L40 80 M154 66 L160 64"/>
+  <!-- flower on top -->
+  <circle cx="92" cy="38" r="8"/>
+  <circle cx="108" cy="38" r="8"/>
+  <circle cx="100" cy="30" r="8"/>
+  <circle cx="100" cy="38" r="5"/>
+  <!-- pot -->
+  <rect x="58" y="146" width="84" height="14" rx="4"/>
+  <path d="M64 160 L136 160 L126 196 L74 196 Z"/>
+  <path d="M68 174 L132 174 L130 180 L70 180 Z"/>
+</svg>

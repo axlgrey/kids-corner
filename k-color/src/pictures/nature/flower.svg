@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <circle cx="30" cy="28" r="15"/>
+  <path class="n" stroke-width="2" d="M30 4 L30 8 M30 48 L30 52 M6 28 L10 28 M50 28 L54 28"/>
+  <path d="M140 30 Q140 18 152 20 Q158 10 170 15 Q184 11 186 24 Q198 26 193 36 L144 36 Q134 36 140 30 Z"/>
+  <!-- ground -->
+  <path d="M0 172 Q100 162 200 172 L200 200 L0 200 Z"/>
+  <!-- small flowers -->
+  <path class="n" d="M26 172 L26 150 M174 172 L174 146"/>
+  <circle cx="26" cy="144" r="8"/>
+  <circle cx="26" cy="144" r="3"/>
+  <path d="M168 140 Q174 126 180 140 Q174 148 168 140 Z"/>
+  <!-- bee -->
+  <ellipse cx="160" cy="76" rx="12" ry="8"/>
+  <path class="n" d="M156 69 L156 83 M163 69 L163 83"/>
+  <ellipse cx="156" cy="66" rx="6" ry="4"/>
+  <ellipse cx="166" cy="66" rx="6" ry="4"/>
+  <path class="n" stroke-width="2" d="M148 76 Q140 90 130 84"/>
+  <!-- stem -->
+  <path d="M97 110 Q94 140 98 174 L104 174 Q100 140 103 110 Z"/>
+  <!-- leaves -->
+  <path d="M98 150 Q66 118 50 142 Q70 162 98 150 Z"/>
+  <path class="n" stroke-width="2" d="M96 150 Q74 140 56 142"/>
+  <path d="M102 136 Q134 104 150 128 Q130 148 102 136 Z"/>
+  <path class="n" stroke-width="2" d="M104 136 Q126 126 144 128"/>
+  <!-- outer petals -->
+  <ellipse cx="100" cy="40" rx="17" ry="24"/>
+  <ellipse cx="100" cy="104" rx="17" ry="24"/>
+  <ellipse cx="68" cy="72" rx="24" ry="17"/>
+  <ellipse cx="132" cy="72" rx="24" ry="17"/>
+  <ellipse cx="77" cy="49" rx="17" ry="22" transform="rotate(-45 77 49)"/>
+  <ellipse cx="123" cy="49" rx="17" ry="22" transform="rotate(45 123 49)"/>
+  <ellipse cx="77" cy="95" rx="17" ry="22" transform="rotate(45 77 95)"/>
+  <ellipse cx="123" cy="95" rx="17" ry="22" transform="rotate(-45 123 95)"/>
+  <!-- center -->
+  <circle cx="100" cy="72" r="22"/>
+  <circle cx="100" cy="72" r="13"/>
+</svg>

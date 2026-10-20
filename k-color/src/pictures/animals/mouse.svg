@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <circle cx="172" cy="26" r="13"/>
+  <path d="M14 30 Q14 18 26 20 Q32 10 44 15 Q58 11 60 24 Q72 26 67 36 L18 36 Q8 36 14 30 Z"/>
+  <!-- ground -->
+  <path d="M0 176 Q100 166 200 176 L200 200 L0 200 Z"/>
+  <!-- cheese -->
+  <path d="M140 182 L194 182 L194 150 L140 166 Z"/>
+  <path d="M140 166 L194 150 L176 142 Z"/>
+  <circle cx="158" cy="172" r="5"/>
+  <circle cx="180" cy="164" r="4"/>
+  <circle cx="184" cy="176" r="3"/>
+  <!-- tail -->
+  <path class="n" d="M48 166 Q14 168 16 140 Q18 120 34 118 Q44 120 40 130"/>
+  <!-- body -->
+  <path d="M46 182 Q38 134 92 130 Q140 134 132 182 Z"/>
+  <path d="M70 144 Q90 138 108 144 Q112 166 106 182 L74 182 Q68 166 70 144 Z"/>
+  <!-- feet -->
+  <ellipse cx="66" cy="182" rx="14" ry="8"/>
+  <ellipse cx="114" cy="182" rx="14" ry="8"/>
+  <!-- big ears -->
+  <circle cx="46" cy="50" r="32"/>
+  <circle cx="134" cy="50" r="32"/>
+  <circle cx="46" cy="50" r="20"/>
+  <circle cx="134" cy="50" r="20"/>
+  <!-- head -->
+  <ellipse cx="90" cy="92" rx="54" ry="44"/>
+  <!-- eyes -->
+  <ellipse class="k" cx="70" cy="88" rx="8" ry="10"/>
+  <ellipse class="k" cx="110" cy="88" rx="8" ry="10"/>
+  <circle class="w" cx="67" cy="84" r="3"/>
+  <circle class="w" cx="107" cy="84" r="3"/>
+  <circle class="w" cx="73" cy="92" r="1.5"/>
+  <circle class="w" cx="113" cy="92" r="1.5"/>
+  <!-- blush -->
+  <ellipse cx="56" cy="106" rx="8" ry="5"/>
+  <ellipse cx="124" cy="106" rx="8" ry="5"/>
+  <!-- nose & mouth -->
+  <circle cx="90" cy="104" r="6"/>
+  <path class="n" d="M90 110 Q85 116 80 112 M90 110 Q95 116 100 112"/>
+  <path class="n" stroke-width="2" d="M44 98 L24 94 M44 104 L24 106 M136 98 L156 94 M136 104 L156 106"/>
+  <!-- arms holding cheese crumb -->
+  <path d="M80 150 L100 150 L100 162 L80 162 Z"/>
+  <ellipse cx="76" cy="156" rx="8" ry="7"/>
+  <ellipse cx="104" cy="156" rx="8" ry="7"/>
+</svg>

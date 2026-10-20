@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- board -->
+  <path d="M10 186 Q100 170 190 186 L190 196 L10 196 Z"/>
+  <!-- slice -->
+  <path d="M34 54 Q100 22 166 54 L100 186 Z"/>
+  <!-- crust -->
+  <path d="M24 38 Q100 0 176 38 Q178 50 166 56 Q100 24 34 56 Q22 50 24 38 Z"/>
+  <path class="n" stroke-width="2" d="M50 34 L54 40 M80 22 L82 30 M118 22 L116 30 M148 32 L144 40"/>
+  <!-- sauce edge -->
+  <path d="M40 58 Q100 30 160 58 L154 70 Q100 46 46 70 Z"/>
+  <!-- cheese drips -->
+  <path d="M64 114 Q62 132 68 132 Q74 132 72 116 Z"/>
+  <path d="M130 118 Q128 140 134 140 Q140 140 138 120 Z"/>
+  <!-- pepperoni -->
+  <circle cx="80" cy="78" r="13"/>
+  <circle class="n" cx="76" cy="74" r="2" stroke-width="2"/>
+  <circle class="n" cx="84" cy="82" r="2" stroke-width="2"/>
+  <circle cx="124" cy="80" r="12"/>
+  <circle class="n" cx="120" cy="78" r="2" stroke-width="2"/>
+  <circle class="n" cx="128" cy="84" r="2" stroke-width="2"/>
+  <circle cx="100" cy="120" r="11"/>
+  <circle class="n" cx="97" cy="117" r="2" stroke-width="2"/>
+  <circle cx="102" cy="156" r="7"/>
+  <!-- peppers -->
+  <path d="M62 98 Q72 88 84 96 Q80 102 72 100 Q66 102 62 98 Z"/>
+  <path d="M118 100 Q130 94 138 104 Q132 108 126 104 Q120 106 118 100 Z"/>
+  <!-- olives -->
+  <circle cx="104" cy="58" r="6"/>
+  <circle cx="104" cy="58" r="2"/>
+  <circle cx="86" cy="138" r="5"/>
+  <circle cx="86" cy="138" r="2"/>
+  <circle cx="116" cy="140" r="5"/>
+  <circle cx="116" cy="140" r="2"/>
+  <!-- basil -->
+  <path d="M142 64 Q152 56 158 66 Q150 72 142 64 Z"/>
+  <path d="M50 64 Q56 54 64 62 Q58 70 50 64 Z"/>
+</svg>
