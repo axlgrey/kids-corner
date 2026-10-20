@@ -1,0 +1,16 @@
+{
+  "name": "Piano Fun!",
+  "short_name": "Piano Fun",
+  "description": "A kid-friendly piano. Tap colorful keys, pick instruments, and learn simple songs.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff3c4",
+  "theme_color": "#7b2cbf",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

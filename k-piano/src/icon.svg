@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#ffd6e8"/>
+  <circle cx="256" cy="256" r="200" fill="#fff3c4"/>
+  <rect x="96" y="150" width="320" height="220" rx="24" fill="#333"/>
+  <g stroke="#222" stroke-width="6">
+    <rect x="110" y="164" width="56" height="192" rx="10" fill="#fff"/>
+    <rect x="170" y="164" width="56" height="192" rx="10" fill="#fff"/>
+    <rect x="230" y="164" width="56" height="192" rx="10" fill="#fff"/>
+    <rect x="290" y="164" width="56" height="192" rx="10" fill="#fff"/>
+    <rect x="350" y="164" width="56" height="192" rx="10" fill="#fff"/>
+  </g>
+  <rect x="110" y="332" width="56" height="24" rx="8" fill="#e63946"/>
+  <rect x="170" y="332" width="56" height="24" rx="8" fill="#fb8500"/>
+  <rect x="230" y="332" width="56" height="24" rx="8" fill="#ffbe0b"/>
+  <rect x="290" y="332" width="56" height="24" rx="8" fill="#8ac926"/>
+  <rect x="350" y="332" width="56" height="24" rx="8" fill="#3a86ff"/>
+  <rect x="150" y="164" width="36" height="110" rx="6" fill="#111"/>
+  <rect x="210" y="164" width="36" height="110" rx="6" fill="#111"/>
+  <rect x="330" y="164" width="36" height="110" rx="6" fill="#111"/>
+  <text x="380" y="130" font-size="90" text-anchor="middle">🎵</text>
+</svg>
