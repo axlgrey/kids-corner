@@ -89,18 +89,21 @@ button { font-family: inherit; cursor: pointer; }
 .stage {
   flex: 1;
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
+  justify-content: flex-end;
   padding: 8px 12px 12px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .keyboard {
   position: relative;
   display: flex;
+  flex: 1 1 auto;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   max-height: 420px;
-  margin: auto 0 0;
+  overflow: hidden;
   touch-action: none;
   background: #333;
   border-radius: 18px;
@@ -144,7 +147,7 @@ button { font-family: inherit; cursor: pointer; }
   top: 8px;
   z-index: 2;
   width: calc((100% - 16px) / var(--whites) * 0.6);
-  height: 58%;
+  height: calc((100% - 16px) * 0.6);
   left: calc(8px + (100% - 16px) / var(--whites) * var(--pos) - (100% - 16px) / var(--whites) * 0.3);
   background: linear-gradient(#444, #111);
   border-radius: 0 0 10px 10px;
