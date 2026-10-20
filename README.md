@@ -11,6 +11,7 @@ Live site: `https://<owner>.github.io/kids-corner/`
 | App | Folder | What it does |
 |---|---|---|
 | Color Fun! | [`k-color/src/`](k-color/src/) | Pick a picture and tap areas to color them in. |
+| Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 
 ## Color Fun!
 
@@ -39,6 +40,26 @@ SVG conventions:
 - `class="w"`: solid white with no outline, not colorable (e.g. eye shine).
 - Set `stroke-width` on a shape to override the default of `3`.
 - Draw later shapes on top of earlier ones, just as SVG renders them.
+
+## Piano Fun!
+
+- Colorful two-octave keyboard (C4 to C6), with sounds generated in the
+  browser, so no audio files are needed.
+- 5 instruments: piano, bells, organ, robot and kitty.
+- Follow-along mode with 6 songs: Twinkle Twinkle, Mary Had a Little Lamb,
+  Happy Birthday, Row Your Boat, Jingle Bells and Ode to Joy. Kids can listen
+  first, then play the highlighted keys.
+- Note names can be toggled on or off; the chosen instrument and label setting
+  are remembered on the device.
+- Works fully offline, with the same update banner as Color Fun!.
+
+### Adding Songs
+
+1. Add an entry to `SONGS` in `k-piano/src/songs.js`, e.g.
+   `{ id: "frere", name: "🔔 Frere Jacques", notes: "C4 D4 E4 C4" }`.
+2. Write each note as `NAME:BEATS` (beats default to 1, so `G4:2` is twice
+   as long). Sharps use `#`, e.g. `A#4`. Notes must be between C4 and C6.
+3. Bump `VERSION` in `k-piano/src/sw.js`.
 
 ## Adding a New App
 
