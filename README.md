@@ -66,9 +66,8 @@ SVG conventions:
 1. Create a folder such as `my-app/src/` containing an `index.html` and a
    `manifest.webmanifest`. Use relative paths (`./`, `app.js`), because the
    site is served from `/kids-corner/`, not the domain root.
-2. Run `./wrapper.sh --init` from the parent folder. It finds every
-   `manifest.webmanifest` and adds a button for it to the home page
-   (`index.html`), labelled with the manifest's `name`.
+2. Add a card for it to the home page (`index.html`), using the app's name,
+   description, `theme_color` and icon from its manifest.
 
 ## Running Locally
 
@@ -86,16 +85,3 @@ Then open `http://localhost:8000/`.
 Every push to `main` publishes the repository to GitHub Pages through
 `.github/workflows/pages.yml`. In the repository settings, set
 **Settings → Pages → Source** to **GitHub Actions** once.
-
-The helper script one folder up does the setup and pushing:
-
-```bash
-./wrapper.sh --load .env --init --push
-```
-
-- `--load FILE` reads `GH_USERNAME`, `GH_PASSWORD` (a personal access token)
-  and `GH_URL` from a `KEY=value` file. Keep that file outside this
-  repository.
-- `--init` regenerates the home page and the Pages workflow. It is safe to run
-  repeatedly.
-- `--push` commits any changes and pushes to `main`.
