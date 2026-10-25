@@ -731,16 +731,15 @@
 
   // ---------- Start ----------
 
-  // iOS Safari: 100dvh changes when bottom bars appear, so lock the height
-  // from innerHeight and only update it when the width changes (rotation).
-  let lockedWidth = 0;
-  const lockHeight = () => {
-    if (window.innerWidth === lockedWidth) return;
-    lockedWidth = window.innerWidth;
+  // iOS Safari: follow the real visible height (innerHeight) instead of
+  // 100vh/100dvh, which leave a gap or overlap when Safari's bars change.
+  const syncHeight = () => {
     document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
   };
-  lockHeight();
-  window.addEventListener("resize", lockHeight);
+  syncHeight();
+  window.addEventListener("resize", syncHeight);
+  window.addEventListener("orientationchange", () => setTimeout(syncHeight, 300));
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", syncHeight);
 
   renderBrushes();
   renderSizes();
