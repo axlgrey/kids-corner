@@ -425,7 +425,11 @@
 
     if (settings.traceMode === "behind") drawOutline();
     octx.drawImage(canvas, 0, 0);
-    if (settings.traceMode === "front") drawOutline();
+    if (settings.traceMode === "front") {
+      octx.globalCompositeOperation = "multiply";
+      drawOutline();
+      octx.globalCompositeOperation = "source-over";
+    }
 
     const found = settings.traceKey && settings.traceMode !== "off" && findPicture(settings.traceKey);
     const a = document.createElement("a");
