@@ -1,7 +1,7 @@
 // Service worker: precaches the whole app (pages, styles, scripts, icons and
 // every picture listed in catalog.js) so it works fully offline.
 // Bump VERSION whenever files change to force clients to refresh the cache.
-const VERSION = "v8";
+const VERSION = "v9";
 const CACHE = `drawfun-${VERSION}`;
 
 importScripts("catalog.js");

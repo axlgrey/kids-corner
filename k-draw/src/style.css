@@ -12,7 +12,13 @@ html, body {
 
 button { font: inherit; color: inherit; }
 
-.screen { display: none; height: 100%; height: var(--app-height, 100dvh); }
+html, body { overflow: hidden; }
+
+/* Pin each screen to the viewport edges instead of computing a height.
+   On installed iPhone apps, innerHeight/100vh can exclude the status bar,
+   which left a notch-sized gap at the bottom and let the page scroll up
+   under the notch. inset: 0 always matches the real visible area. */
+.screen { display: none; position: fixed; inset: 0; }
 .screen.active { display: flex; flex-direction: column; }
 
 #home {

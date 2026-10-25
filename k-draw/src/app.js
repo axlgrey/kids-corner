@@ -731,16 +731,6 @@
 
   // ---------- Start ----------
 
-  // iOS Safari: follow the real visible height (innerHeight) instead of
-  // 100vh/100dvh, which leave a gap or overlap when Safari's bars change.
-  const syncHeight = () => {
-    document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
-  };
-  syncHeight();
-  window.addEventListener("resize", syncHeight);
-  window.addEventListener("orientationchange", () => setTimeout(syncHeight, 300));
-  if (window.visualViewport) window.visualViewport.addEventListener("resize", syncHeight);
-
   renderBrushes();
   renderSizes();
   renderPalette();
