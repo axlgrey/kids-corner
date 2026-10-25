@@ -88,9 +88,8 @@
     svg.innerHTML = markup;
     svg.querySelectorAll("*").forEach((el) => {
       if (el.nodeName === "g") return;
-      if (el.classList.contains("w")) { el.remove(); return; }
-      el.setAttribute("fill", "none");
-      el.setAttribute("stroke", color);
+      el.setAttribute("fill", el.classList.contains("n") ? "none" : el.classList.contains("k") ? color : "#ffffff");
+      el.setAttribute("stroke", el.classList.contains("w") ? "none" : color);
       if (!el.hasAttribute("stroke-width")) el.setAttribute("stroke-width", "3");
       el.setAttribute("stroke-linejoin", "round");
       el.setAttribute("stroke-linecap", "round");
