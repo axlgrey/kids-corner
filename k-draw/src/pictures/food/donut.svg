@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- plate -->
+  <ellipse cx="100" cy="112" rx="96" ry="84"/>
+  <ellipse cx="100" cy="112" rx="80" ry="70"/>
+  <!-- dough -->
+  <path fill-rule="evenodd" d="M100 30 A70 66 0 1 1 99.9 30 Z M100 82 A22 20 0 1 0 100.1 82 Z"/>
+  <!-- icing -->
+  <path fill-rule="evenodd" d="M100 38 Q138 36 158 70 Q168 92 160 112 Q150 124 156 134 Q142 150 128 140 Q112 158 98 146 Q80 156 70 142 Q52 148 46 130 Q34 116 42 98 Q42 52 100 38 Z M100 82 A22 20 0 1 0 100.1 82 Z"/>
+  <!-- hole rim -->
+  <path class="n" d="M78 102 A22 20 0 1 1 122 102 A22 20 0 1 1 78 102"/>
+  <!-- sprinkles -->
+  <rect x="64" y="62" width="14" height="5" rx="2" transform="rotate(30 71 64)"/>
+  <rect x="98" y="50" width="14" height="5" rx="2" transform="rotate(-20 105 52)"/>
+  <rect x="132" y="62" width="14" height="5" rx="2" transform="rotate(60 139 64)"/>
+  <rect x="140" y="98" width="14" height="5" rx="2" transform="rotate(-10 147 100)"/>
+  <rect x="52" y="96" width="14" height="5" rx="2" transform="rotate(-45 59 98)"/>
+  <rect x="66" y="126" width="14" height="5" rx="2" transform="rotate(20 73 128)"/>
+  <rect x="102" y="132" width="14" height="5" rx="2" transform="rotate(10 109 134)"/>
+  <rect x="126" y="122" width="14" height="5" rx="2" transform="rotate(-40 133 124)"/>
+  <circle cx="84" cy="72" r="3"/>
+  <circle cx="118" cy="74" r="3"/>
+  <circle cx="60" cy="116" r="3"/>
+  <circle cx="142" cy="116" r="3"/>
+  <circle cx="92" cy="138" r="3"/>
+  <!-- shine -->
+  <path d="M60 70 Q66 58 78 54 Q70 64 66 76 Z"/>
+</svg>

@@ -1,0 +1,16 @@
+{
+  "name": "Draw Fun!",
+  "short_name": "Draw Fun",
+  "description": "A kid-friendly drawing app with pencils, pens, crayons and tracing pictures.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#c9e8ff",
+  "theme_color": "#3a86ff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

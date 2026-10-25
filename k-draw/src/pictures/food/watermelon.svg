@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- picnic blanket -->
+  <path d="M0 150 L200 150 L200 200 L0 200 Z"/>
+  <rect x="0" y="150" width="25" height="25"/>
+  <rect x="50" y="150" width="25" height="25"/>
+  <rect x="100" y="150" width="25" height="25"/>
+  <rect x="150" y="150" width="25" height="25"/>
+  <rect x="25" y="175" width="25" height="25"/>
+  <rect x="75" y="175" width="25" height="25"/>
+  <rect x="125" y="175" width="25" height="25"/>
+  <rect x="175" y="175" width="25" height="25"/>
+  <!-- big slice -->
+  <path d="M8 40 A92 92 0 0 0 192 40 Z"/>
+  <path d="M20 40 A80 80 0 0 0 180 40 Z"/>
+  <path d="M28 40 A72 72 0 0 0 172 40 Z"/>
+  <path class="n" stroke-width="2" d="M40 54 Q38 70 46 86 M160 54 Q162 70 154 86"/>
+  <!-- seeds -->
+  <ellipse cx="64" cy="64" rx="4" ry="7" transform="rotate(-20 64 64)"/>
+  <ellipse cx="100" cy="72" rx="4" ry="7"/>
+  <ellipse cx="136" cy="64" rx="4" ry="7" transform="rotate(20 136 64)"/>
+  <ellipse cx="80" cy="94" rx="4" ry="7" transform="rotate(-10 80 94)"/>
+  <ellipse cx="120" cy="94" rx="4" ry="7" transform="rotate(10 120 94)"/>
+  <ellipse cx="100" cy="116" rx="4" ry="7"/>
+  <!-- bite -->
+  <path d="M150 40 Q154 50 162 48 Q166 56 174 52 Q176 46 172 40 Z"/>
+  <!-- small slice -->
+  <path stroke-width="1.5" d="M120 186 L196 186 L158 132 Z"/>
+  <path stroke-width="1.5" d="M126 182 L190 182 L158 138 Z"/>
+  <path stroke-width="1.5" d="M132 178 L184 178 L158 144 Z"/>
+  <ellipse stroke-width="1.5" cx="152" cy="168" rx="2" ry="4"/>
+  <ellipse stroke-width="1.5" cx="164" cy="168" rx="2" ry="4"/>
+  <ellipse stroke-width="1.5" cx="158" cy="156" rx="2" ry="4"/>
+  <!-- ant -->
+  <circle cx="30" cy="136" r="5"/>
+  <circle cx="40" cy="138" r="4"/>
+  <circle cx="48" cy="136" r="5"/>
+  <path class="n" stroke-width="2" d="M34 140 L30 148 M40 142 L40 148 M46 140 L50 148 M52 132 L56 126"/>
+</svg>

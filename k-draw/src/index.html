@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#3a86ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Draw Fun">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Draw Fun!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="painter" class="screen active">
+    <header class="toolbar">
+      <h1 class="title">✏️ Draw Fun!</h1>
+      <div class="tools">
+        <button id="traceBtn" class="tool" aria-label="Trace a picture">🖼️</button>
+        <button id="undoBtn" class="tool" aria-label="Undo">↩️</button>
+        <button id="clearBtn" class="tool" aria-label="Start over">🗑️</button>
+        <button id="saveBtn" class="tool" aria-label="Save">💾</button>
+        <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+      </div>
+    </header>
+    <main class="canvas-wrap">
+      <div id="board" class="board">
+        <canvas id="drawing" width="1024" height="1024"></canvas>
+      </div>
+    </main>
+    <footer class="panel">
+      <div id="brushes" class="row brushes"></div>
+      <div id="sizes" class="row sizes"></div>
+      <div id="palette" class="row palette"></div>
+    </footer>
+  </section>
+
+  <div id="traceSheet" class="sheet" hidden>
+    <div class="sheet-body" role="dialog" aria-label="Tracing">
+      <header class="sheet-header">
+        <h2>🖼️ Trace</h2>
+        <button id="traceClose" class="tool" aria-label="Close">✕</button>
+      </header>
+      <div class="trace-settings">
+        <div id="traceMode" class="seg" role="group" aria-label="Show outline">
+          <button data-mode="off" aria-label="Hide outline">🚫 Off</button>
+          <button data-mode="front" aria-label="Outline in front">⬆️ Front</button>
+          <button data-mode="behind" aria-label="Outline behind">⬇️ Behind</button>
+        </div>
+        <div id="traceColors" class="trace-colors" role="group" aria-label="Outline color"></div>
+        <label class="opacity">
+          <span aria-hidden="true">👻</span>
+          <input id="traceOpacity" type="range" min="10" max="100" step="5" aria-label="Outline opacity">
+          <output id="traceOpacityOut"></output>
+        </label>
+      </div>
+      <nav id="categories" class="categories"></nav>
+      <div id="gallery" class="gallery"></div>
+    </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ New version is ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="catalog.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

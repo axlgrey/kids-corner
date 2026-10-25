@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sea floor -->
+  <path d="M0 176 Q50 166 100 174 Q150 182 200 172 L200 200 L0 200 Z"/>
+  <!-- seaweed -->
+  <path d="M20 180 Q8 154 22 134 Q34 114 22 94 Q36 112 32 134 Q24 156 30 180 Z"/>
+  <path d="M178 180 Q170 158 182 140 Q192 122 184 104 Q198 120 194 140 Q184 158 188 180 Z"/>
+  <!-- shell -->
+  <path d="M130 184 Q140 162 152 184 Z"/>
+  <path class="n" stroke-width="2" d="M141 168 L135 184 M141 168 L141 184 M141 168 L147 184"/>
+  <!-- starfish -->
+  <path d="M66 172 L70 162 L74 172 L84 172 L76 178 L80 188 L70 182 L60 188 L64 178 L56 172 Z"/>
+  <!-- bubbles -->
+  <circle cx="160" cy="62" r="9"/>
+  <circle class="w" cx="157" cy="59" r="2.5"/>
+  <circle cx="172" cy="40" r="6"/>
+  <circle cx="164" cy="22" r="4"/>
+  <circle cx="30" cy="40" r="7"/>
+  <!-- tail -->
+  <path d="M128 104 Q146 80 166 78 Q174 80 170 92 Q164 104 170 116 Q174 128 166 130 Q146 128 128 104 Z"/>
+  <!-- top fin -->
+  <path d="M68 60 Q84 30 110 44 Q104 56 100 64 Z"/>
+  <!-- body -->
+  <path d="M28 104 Q30 58 82 56 Q132 58 136 104 Q132 150 82 152 Q30 150 28 104 Z"/>
+  <!-- belly -->
+  <path d="M44 122 Q82 140 120 122 Q110 146 82 148 Q54 146 44 122 Z"/>
+  <!-- bottom fin -->
+  <path d="M74 150 Q82 170 100 164 Q94 156 94 150 Z"/>
+  <!-- side fin -->
+  <path d="M96 104 Q110 92 120 104 Q110 118 96 104 Z"/>
+  <!-- spots -->
+  <circle cx="94" cy="76" r="5"/>
+  <circle cx="110" cy="84" r="4"/>
+  <!-- eye -->
+  <circle cx="58" cy="94" r="15"/>
+  <circle class="k" cx="60" cy="96" r="10"/>
+  <circle class="w" cx="56" cy="91" r="4"/>
+  <circle class="w" cx="63" cy="100" r="2"/>
+  <!-- blush -->
+  <ellipse cx="62" cy="120" rx="8" ry="5"/>
+  <!-- smile -->
+  <path class="n" d="M34 112 Q40 120 48 114"/>
+</svg>

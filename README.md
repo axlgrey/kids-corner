@@ -7,6 +7,7 @@ JavaScript with no build step.
 Live site: <https://axlgrey.github.io/kids-corner/>
 
 - Color Fun!: <https://axlgrey.github.io/kids-corner/k-color/src/>
+- Draw Fun!: <https://axlgrey.github.io/kids-corner/k-draw/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 
 ## Apps
@@ -14,6 +15,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | App | Folder | What it does |
 |---|---|---|
 | Color Fun! | [`k-color/src/`](k-color/src/) | Pick a picture and tap areas to color them in. |
+| Draw Fun! | [`k-draw/src/`](k-draw/src/) | Draw freehand with pencils, pens and crayons, or trace pictures. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 
 ## Color Fun!
@@ -43,6 +45,22 @@ SVG conventions:
 - `class="w"`: solid white with no outline, not colorable (e.g. eye shine).
 - Set `stroke-width` on a shape to override the default of `3`.
 - Draw later shapes on top of earlier ones, just as SVG renders them.
+
+## Draw Fun!
+
+- Brushes: pencil (soft, grainy), pen (solid), crayon (waxy texture) and
+  eraser, in 5 sizes with a 15-color palette.
+- Tracing: pick one of 34 pictures and show its outline in front of or
+  behind the drawing, with adjustable outline color and opacity.
+- Undo (last 20 strokes), start over, save as a PNG and fullscreen mode.
+- The drawing and settings are saved on the device.
+- Works fully offline, with the same update banner as Color Fun!.
+
+### Adding Tracing Pictures
+
+Tracing pictures use the same SVG files and conventions as Color Fun!: save
+the SVG as `k-draw/src/pictures/<category id>/<picture id>.svg`, add it to
+`k-draw/src/catalog.js`, and bump `VERSION` in `k-draw/src/sw.js`.
 
 ## Piano Fun!
 

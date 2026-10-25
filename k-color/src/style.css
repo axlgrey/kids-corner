@@ -140,14 +140,18 @@ html, body {
 .fullscreen-btn.on { background: #8338ec; color: #fff; }
 
 .canvas-wrap {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
+  container-type: size;
 }
 .canvas {
+  flex: 0 0 auto;
   height: 100%;
   max-width: 100%;
   aspect-ratio: 1;
@@ -155,6 +159,13 @@ html, body {
   border-radius: 24px;
   box-shadow: 0 6px 0 rgba(0, 0, 0, .12);
   padding: 2%;
+}
+@supports (width: 1cqmin) {
+  .canvas {
+    width: 100cqmin;
+    height: 100cqmin;
+    max-width: none;
+  }
 }
 .canvas svg { width: 100%; height: 100%; touch-action: manipulation; }
 .canvas svg .f { cursor: pointer; transition: fill .15s; }
@@ -185,7 +196,7 @@ html, body {
   #painter.active {
     display: grid;
     grid-template-columns: auto 1fr auto;
-    grid-template-rows: 100%;
+    grid-template-rows: minmax(0, 1fr);
   }
   .toolbar {
     flex-direction: column;

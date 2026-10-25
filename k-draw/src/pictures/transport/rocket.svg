@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- planet -->
+  <circle cx="34" cy="40" r="18"/>
+  <ellipse cx="34" cy="40" rx="30" ry="6"/>
+  <circle cx="34" cy="40" r="12"/>
+  <!-- moon -->
+  <circle cx="166" cy="160" r="18"/>
+  <circle cx="160" cy="154" r="4"/>
+  <circle cx="172" cy="166" r="3"/>
+  <!-- stars -->
+  <path d="M168 20 L171 28 L179 28 L173 33 L175 41 L168 36 L161 41 L163 33 L157 28 L165 28 Z"/>
+  <path d="M30 140 L32 146 L38 146 L33 150 L35 156 L30 152 L25 156 L27 150 L22 146 L28 146 Z"/>
+  <path d="M152 92 L154 96 L158 96 L155 99 L156 103 L152 101 L148 103 L149 99 L146 96 L150 96 Z"/>
+  <!-- flames -->
+  <path d="M78 150 Q100 204 122 150 Z"/>
+  <path d="M88 150 Q100 184 112 150 Z"/>
+  <!-- fins -->
+  <path d="M66 110 Q38 120 40 156 L70 142 Z"/>
+  <path d="M134 110 Q162 120 160 156 L130 142 Z"/>
+  <!-- body -->
+  <path d="M100 14 Q146 46 138 146 L62 146 Q54 46 100 14 Z"/>
+  <!-- nose cone -->
+  <path d="M100 14 Q122 30 130 52 L70 52 Q78 30 100 14 Z"/>
+  <!-- window -->
+  <circle cx="100" cy="88" r="22"/>
+  <circle cx="100" cy="88" r="15"/>
+  <path class="n" stroke-width="2" d="M92 80 Q96 76 100 76"/>
+  <!-- band -->
+  <path d="M64 124 L136 124 L137 136 L63 136 Z"/>
+  <!-- nozzle -->
+  <path d="M74 146 L126 146 L120 154 L80 154 Z"/>
+</svg>

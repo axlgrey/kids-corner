@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- night sky -->
+  <path d="M30 14 Q14 20 14 36 Q14 52 30 56 Q20 46 20 36 Q20 22 30 14 Z"/>
+  <path d="M60 50 L62 56 L68 56 L63 60 L65 66 L60 62 L55 66 L57 60 L52 56 L58 56 Z"/>
+  <path d="M170 110 L172 116 L178 116 L173 120 L175 126 L170 122 L165 126 L167 120 L162 116 L168 116 Z"/>
+  <!-- light beams -->
+  <path d="M116 42 L196 16 L196 64 Z"/>
+  <path d="M84 42 L4 72 L4 104 Z"/>
+  <!-- rocks -->
+  <path d="M30 176 Q48 136 100 140 Q152 136 170 176 Z"/>
+  <path class="n" stroke-width="2" d="M60 158 Q70 152 80 156 M120 154 Q130 150 140 156"/>
+  <!-- tower -->
+  <path d="M74 150 L84 62 L116 62 L126 150 Z"/>
+  <path d="M81 90 L119 90 L121 108 L79 108 Z"/>
+  <path d="M77 122 L123 122 L125 140 L75 140 Z"/>
+  <!-- door & window -->
+  <path d="M92 150 L92 132 Q100 124 108 132 L108 150 Z"/>
+  <rect x="94" y="70" width="12" height="14" rx="6"/>
+  <!-- balcony -->
+  <rect x="70" y="54" width="60" height="9" rx="3"/>
+  <path class="n" stroke-width="2" d="M76 54 L76 46 M86 54 L86 46 M96 54 L96 46 M104 54 L104 46 M114 54 L114 46 M124 54 L124 46 M74 46 L126 46"/>
+  <!-- lamp room -->
+  <rect x="84" y="30" width="32" height="24" rx="2"/>
+  <circle cx="100" cy="42" r="7"/>
+  <path d="M80 30 L100 8 L120 30 Z"/>
+  <circle cx="100" cy="7" r="3"/>
+  <!-- sea -->
+  <path d="M0 160 Q25 150 50 164 Q75 176 100 164 Q125 152 150 164 Q175 176 200 160 L200 200 L0 200 Z"/>
+  <path class="n" stroke-width="2" d="M14 182 Q24 176 34 182 M80 190 Q90 184 100 190 M150 184 Q160 178 170 184"/>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <circle cx="28" cy="28" r="14"/>
+  <path d="M140 32 Q140 20 152 22 Q158 12 170 17 Q184 13 186 26 Q198 28 193 38 L144 38 Q134 38 140 32 Z"/>
+  <path d="M60 24 L62 30 L68 30 L63 34 L65 40 L60 36 L55 40 L57 34 L52 30 L58 30 Z"/>
+  <!-- ground -->
+  <path d="M0 178 Q100 168 200 178 L200 200 L0 200 Z"/>
+  <!-- yarn ball -->
+  <circle cx="170" cy="168" r="16"/>
+  <path class="n" stroke-width="2" d="M158 160 Q170 172 182 162 M156 170 Q170 182 184 172 M164 154 Q160 168 166 183 M154 172 Q140 182 130 176"/>
+  <!-- tail -->
+  <path d="M138 160 Q172 160 168 124 Q166 106 154 108 Q148 112 154 120 Q160 136 136 146 Z"/>
+  <!-- body -->
+  <path d="M58 182 Q50 132 100 128 Q150 132 142 182 Z"/>
+  <path d="M80 140 Q100 134 120 140 Q124 164 118 182 L82 182 Q76 164 80 140 Z"/>
+  <!-- paws -->
+  <ellipse cx="80" cy="182" rx="16" ry="10"/>
+  <ellipse cx="120" cy="182" rx="16" ry="10"/>
+  <path class="n" stroke-width="2" d="M75 178 L75 186 M85 178 L85 186 M115 178 L115 186 M125 178 L125 186"/>
+  <!-- ears -->
+  <path d="M42 68 Q36 20 58 24 Q74 30 84 48 Z"/>
+  <path d="M158 68 Q164 20 142 24 Q126 30 116 48 Z"/>
+  <path d="M50 58 Q48 34 60 36 Q68 40 74 50 Z"/>
+  <path d="M150 58 Q152 34 140 36 Q132 40 126 50 Z"/>
+  <!-- head -->
+  <ellipse cx="100" cy="88" rx="62" ry="50"/>
+  <!-- bow -->
+  <path d="M120 44 Q108 30 106 46 Q108 56 120 50 Z"/>
+  <path d="M120 44 Q132 30 134 46 Q132 56 120 50 Z"/>
+  <circle cx="120" cy="47" r="5"/>
+  <!-- eyes -->
+  <ellipse class="k" cx="76" cy="88" rx="10" ry="12"/>
+  <ellipse class="k" cx="124" cy="88" rx="10" ry="12"/>
+  <circle class="w" cx="72" cy="83" r="4"/>
+  <circle class="w" cx="120" cy="83" r="4"/>
+  <circle class="w" cx="79" cy="93" r="2"/>
+  <circle class="w" cx="127" cy="93" r="2"/>
+  <!-- blush -->
+  <ellipse cx="62" cy="106" rx="9" ry="5"/>
+  <ellipse cx="138" cy="106" rx="9" ry="5"/>
+  <!-- nose & mouth -->
+  <path d="M95 100 L105 100 L100 105 Z"/>
+  <path class="n" d="M100 105 Q95 112 90 108 M100 105 Q105 112 110 108"/>
+  <path class="n" stroke-width="2" d="M48 96 L30 92 M48 102 L30 104 M152 96 L170 92 M152 102 L170 104"/>
+</svg>

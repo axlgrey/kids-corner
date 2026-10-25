@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <circle cx="28" cy="28" r="14"/>
+  <!-- smoke puffs -->
+  <circle cx="58" cy="40" r="10"/>
+  <circle cx="76" cy="26" r="13"/>
+  <circle cx="98" cy="16" r="10"/>
+  <!-- hills -->
+  <path d="M0 112 Q50 84 100 106 Q150 80 200 102 L200 160 L0 160 Z"/>
+  <!-- rails -->
+  <rect x="0" y="172" width="200" height="8"/>
+  <rect x="0" y="180" width="200" height="20"/>
+  <path class="n" stroke-width="2" d="M10 180 L10 200 M40 180 L40 200 M70 180 L70 200 M100 180 L100 200 M130 180 L130 200 M160 180 L160 200 M190 180 L190 200"/>
+  <!-- chimney -->
+  <path d="M50 92 L46 58 L70 58 L66 92 Z"/>
+  <rect x="42" y="50" width="32" height="10" rx="4"/>
+  <!-- boiler -->
+  <rect x="24" y="90" width="90" height="70" rx="12"/>
+  <rect x="24" y="116" width="90" height="10"/>
+  <!-- dome & bell -->
+  <path d="M80 90 Q80 74 92 74 Q104 74 104 90 Z"/>
+  <!-- front light -->
+  <circle cx="30" cy="104" r="8"/>
+  <!-- cab -->
+  <rect x="114" y="62" width="62" height="98" rx="6"/>
+  <path d="M106 62 L184 62 Q184 48 145 46 Q106 48 106 62 Z"/>
+  <rect x="126" y="76" width="38" height="32" rx="6"/>
+  <!-- heart -->
+  <path d="M145 128 Q145 120 152 121 Q157 122 155 129 L146 139 Q139 134 137 129 Q136 121 142 121 Q145 121 145 128 Z"/>
+  <!-- wheels -->
+  <circle cx="48" cy="166" r="14"/>
+  <circle cx="48" cy="166" r="5"/>
+  <circle cx="90" cy="166" r="14"/>
+  <circle cx="90" cy="166" r="5"/>
+  <circle cx="148" cy="164" r="16"/>
+  <circle cx="148" cy="164" r="6"/>
+  <!-- cowcatcher -->
+  <path d="M10 150 L24 150 L24 172 L4 172 Z"/>
+</svg>
