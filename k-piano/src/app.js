@@ -377,6 +377,15 @@
   document.addEventListener("webkitfullscreenchange", syncFullscreenBtns);
 
   // ---- Init ----
+  let lockedWidth = 0;
+  const lockHeight = () => {
+    if (window.innerWidth === lockedWidth) return;
+    lockedWidth = window.innerWidth;
+    document.documentElement.style.setProperty("--app-height", window.innerHeight + "px");
+  };
+  lockHeight();
+  window.addEventListener("resize", lockHeight);
+
   let lastWide = null;
   const onResize = () => {
     const wide = window.innerWidth >= 700;

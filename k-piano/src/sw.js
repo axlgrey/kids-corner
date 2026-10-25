@@ -1,6 +1,6 @@
 // Service worker: precaches the whole app so it works fully offline.
 // Bump VERSION whenever files change to force clients to refresh the cache.
-const VERSION = "v4";
+const VERSION = "v5";
 const CACHE = `pianofun-${VERSION}`;
 
 const APP_FILES = [

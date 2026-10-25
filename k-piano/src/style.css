@@ -15,7 +15,7 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: var(--app-height, 100vh);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -91,7 +91,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 8px 12px 12px;
+  padding: 8px 12px max(28px, env(safe-area-inset-bottom));
   min-height: 0;
   overflow: hidden;
 }
