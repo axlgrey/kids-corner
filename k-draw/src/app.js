@@ -13,13 +13,21 @@
   const SIZES = [6, 12, 22, 36, 56];
   const TRACE_COLORS = ["#9e9e9e", "#222222", "#3a86ff", "#ff70a6", "#ff7b00"];
   const TRACE_MODES = ["off", "front", "behind"];
-  const SETTINGS_KEY = "drawfun-settings-v1";
-  const DRAWING_KEY = "drawfun-drawing-v1";
+  const BLANK = {
+    id: "blank", name: "Blank", icon: "📄", color: "#8338ec", blank: true,
+    pictures: Array.from({ length: 8 }, (_, i) => ({ id: `page-${i + 1}`, name: `Page ${i + 1}` }))
+  };
+  const BOOK = [BLANK, ...CATEGORIES];
+  const SETTINGS_KEY = "drawfun-settings-v2";
+  const DB_NAME = "drawfun";
+  const STORE = "pages";
   const MAX_UNDO = 20;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const sources = new Map();
 
   const $ = (sel) => document.querySelector(sel);
+  const home = $("#home");
+  const painter = $("#painter");
   const board = $("#board");
   const canvas = $("#drawing");
   const ctx = canvas.getContext("2d");
@@ -29,36 +37,66 @@
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
   };
   const write = (key, value) => {
-    try { localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value)); } catch { /* storage full or blocked */ }
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage full or blocked */ }
   };
 
   const settings = Object.assign({
     color: COLORS[13],
     brush: "pen",
     size: 1,
-    traceKey: null,
-    traceMode: "off",
+    traceMode: "front",
     traceColor: TRACE_COLORS[0],
     traceOpacity: 50,
-    traceCategory: CATEGORIES[0].id
+    category: BOOK[0].id
   }, read(SETTINGS_KEY) || {});
   if (!COLORS.includes(settings.color)) settings.color = COLORS[13];
   if (!BRUSHES.some((b) => b.id === settings.brush)) settings.brush = "pen";
   if (!(settings.size >= 0 && settings.size < SIZES.length)) settings.size = 1;
-  if (!TRACE_MODES.includes(settings.traceMode)) settings.traceMode = "off";
-  if (!CATEGORIES.some((c) => c.id === settings.traceCategory)) settings.traceCategory = CATEGORIES[0].id;
+  if (!TRACE_MODES.includes(settings.traceMode)) settings.traceMode = "front";
+  if (!TRACE_COLORS.includes(settings.traceColor)) settings.traceColor = TRACE_COLORS[0];
+  if (!BOOK.some((c) => c.id === settings.category)) settings.category = BOOK[0].id;
   const saveSettings = () => write(SETTINGS_KEY, settings);
+
+  // ---------- Page storage (IndexedDB, one PNG blob per page) ----------
+
+  const memoryStore = new Map();
+  const dbReady = new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+      req.onblocked = () => resolve(null);
+    } catch { resolve(null); }
+  });
+
+  async function dbRequest(mode, run) {
+    const db = await dbReady;
+    if (!db) return run(null);
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(STORE, mode);
+        const req = run(tx.objectStore(STORE));
+        tx.oncomplete = () => resolve(req && req.result);
+        tx.onerror = tx.onabort = () => resolve(undefined);
+      } catch { resolve(undefined); }
+    });
+  }
+
+  const pageGet = (key) => dbRequest("readonly", (store) => store && store.get(key))
+    .then((value) => (value === undefined ? memoryStore.get(key) : value));
+  const pagePut = (key, blob) => {
+    memoryStore.set(key, blob);
+    return dbRequest("readwrite", (store) => store && store.put(blob, key));
+  };
+  const pageDelete = (key) => {
+    memoryStore.delete(key);
+    return dbRequest("readwrite", (store) => store && store.delete(key));
+  };
 
   // ---------- Pictures ----------
 
   const keyOf = (cat, pic) => `${cat.id}/${pic.id}`;
-  const findPicture = (key) => {
-    for (const cat of CATEGORIES) {
-      const pic = cat.pictures.find((p) => keyOf(cat, p) === key);
-      if (pic) return { cat, pic };
-    }
-    return null;
-  };
 
   function loadSource(key) {
     if (!sources.has(key)) {
@@ -101,19 +139,40 @@
 
   let undoStack = [];
   let stroke = null;
+  let current = null;
+  let dirty = false;
+  let persistTimer = 0;
 
-  function restoreDrawing() {
-    const data = localStorage.getItem(DRAWING_KEY);
-    if (!data) return;
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0, SIZE, SIZE);
-    img.src = data;
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
   }
 
-  let persistTimer = 0;
-  function persistDrawing() {
+  async function blobToImage(blob) {
+    const url = URL.createObjectURL(blob);
+    try { return await loadImage(url); } finally { URL.revokeObjectURL(url); }
+  }
+
+  function persistNow() {
     clearTimeout(persistTimer);
-    persistTimer = setTimeout(() => write(DRAWING_KEY, canvas.toDataURL("image/png")), 300);
+    if (!current || !dirty) return Promise.resolve();
+    dirty = false;
+    const key = current.key;
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        if (blob) pagePut(key, blob).then(resolve); else resolve();
+      }, "image/png");
+    });
+  }
+
+  function persistDrawing() {
+    dirty = true;
+    clearTimeout(persistTimer);
+    persistTimer = setTimeout(persistNow, 400);
   }
 
   function pushUndo() {
@@ -182,7 +241,7 @@
   }
 
   canvas.addEventListener("pointerdown", (e) => {
-    if (stroke || (e.pointerType === "mouse" && e.button !== 0)) return;
+    if (stroke || !current || (e.pointerType === "mouse" && e.button !== 0)) return;
     e.preventDefault();
     canvas.setPointerCapture(e.pointerId);
     pushUndo();
@@ -218,10 +277,12 @@
   };
 
   $("#clearBtn").onclick = () => {
-    if (!confirm("Start over?")) return;
-    pushUndo();
+    if (!current || !confirm("Start over?")) return;
+    clearTimeout(persistTimer);
+    dirty = false;
+    undoStack = [];
     ctx.clearRect(0, 0, SIZE, SIZE);
-    persistDrawing();
+    pageDelete(current.key);
   };
 
   // ---------- Tool panel ----------
@@ -274,7 +335,7 @@
     });
   }
 
-  // ---------- Tracing ----------
+  // ---------- Trace outline ----------
 
   const overlay = document.createElement("div");
   overlay.className = "trace";
@@ -283,13 +344,13 @@
 
   async function renderOverlay() {
     const token = ++overlayToken;
-    const key = settings.traceKey;
-    const visible = key && settings.traceMode !== "off";
+    const traced = current && !current.cat.blank;
+    const visible = traced && settings.traceMode !== "off";
     board.classList.toggle("trace-front", settings.traceMode === "front");
-    $("#traceBtn").classList.toggle("on", !!visible);
+    $("#traceBtn").hidden = !traced;
     if (!visible) { overlay.innerHTML = ""; return; }
     let markup;
-    try { markup = await loadSource(key); } catch { if (token === overlayToken) overlay.innerHTML = ""; return; }
+    try { markup = await loadSource(current.key); } catch { if (token === overlayToken) overlay.innerHTML = ""; return; }
     if (token !== overlayToken) return;
     overlay.innerHTML = "";
     overlay.style.opacity = settings.traceOpacity / 100;
@@ -314,63 +375,9 @@
     $("#traceOpacityOut").textContent = `${settings.traceOpacity}%`;
   }
 
-  function renderCategories() {
-    const el = $("#categories");
-    el.innerHTML = "";
-    CATEGORIES.forEach((cat) => {
-      const btn = document.createElement("button");
-      btn.className = "cat-btn" + (cat.id === settings.traceCategory ? " active" : "");
-      btn.style.setProperty("--c", cat.color);
-      btn.textContent = `${cat.icon} ${cat.name}`;
-      btn.onclick = () => {
-        settings.traceCategory = cat.id;
-        saveSettings();
-        renderCategories();
-        renderGallery();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  function renderGallery() {
-    const el = $("#gallery");
-    el.innerHTML = "";
-    const cat = CATEGORIES.find((c) => c.id === settings.traceCategory);
-    cat.pictures.forEach((pic) => {
-      const key = keyOf(cat, pic);
-      const card = document.createElement("button");
-      card.className = "card" + (key === settings.traceKey ? " selected" : "");
-      const thumb = document.createElement("div");
-      thumb.className = "thumb";
-      card.appendChild(thumb);
-      const label = document.createElement("span");
-      label.textContent = pic.name;
-      card.appendChild(label);
-      card.onclick = () => {
-        settings.traceKey = key;
-        if (settings.traceMode === "off") settings.traceMode = "front";
-        saveSettings();
-        renderTraceSettings();
-        renderOverlay();
-        closeTrace();
-      };
-      el.appendChild(card);
-      loadSource(key)
-        .then((markup) => thumb.appendChild(buildOutline(markup, "#222")))
-        .catch(() => { thumb.textContent = "⚠️"; });
-    });
-  }
-
   const sheet = $("#traceSheet");
-  const openTrace = () => {
-    renderTraceSettings();
-    renderCategories();
-    renderGallery();
-    sheet.hidden = false;
-  };
   const closeTrace = () => { sheet.hidden = true; };
-
-  $("#traceBtn").onclick = openTrace;
+  $("#traceBtn").onclick = () => { renderTraceSettings(); sheet.hidden = false; };
   $("#traceClose").onclick = closeTrace;
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeTrace(); });
   document.querySelectorAll("#traceMode button").forEach((btn) => {
@@ -388,55 +395,144 @@
     saveSettings();
   });
 
-  // ---------- Save ----------
+  // ---------- Compose (thumbnails and PNG export) ----------
 
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
+  async function outlineImage(markup, color) {
+    const svg = buildOutline(markup, color);
+    svg.setAttribute("width", SIZE);
+    svg.setAttribute("height", SIZE);
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml" }));
+    try { return await loadImage(url); } finally { URL.revokeObjectURL(url); }
   }
 
-  $("#saveBtn").onclick = async () => {
-    const out = document.createElement("canvas");
-    out.width = out.height = SIZE;
+  async function compose(target, drawing, markup, size) {
+    const out = target || document.createElement("canvas");
+    out.width = out.height = size;
     const octx = out.getContext("2d");
     octx.fillStyle = "#fff";
-    octx.fillRect(0, 0, SIZE, SIZE);
-
+    octx.fillRect(0, 0, size, size);
     let outline = null;
-    const svg = overlay.querySelector("svg");
-    if (svg) {
-      const clone = svg.cloneNode(true);
-      clone.setAttribute("width", SIZE);
-      clone.setAttribute("height", SIZE);
-      const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: "image/svg+xml" }));
-      try { outline = await loadImage(url); } catch { outline = null; }
-      URL.revokeObjectURL(url);
+    if (markup && settings.traceMode !== "off") {
+      try { outline = await outlineImage(markup, settings.traceColor); } catch { outline = null; }
     }
     const drawOutline = () => {
       if (!outline) return;
       octx.globalAlpha = settings.traceOpacity / 100;
-      octx.drawImage(outline, 0, 0, SIZE, SIZE);
+      octx.drawImage(outline, 0, 0, size, size);
       octx.globalAlpha = 1;
     };
-
     if (settings.traceMode === "behind") drawOutline();
-    octx.drawImage(canvas, 0, 0);
+    if (drawing) octx.drawImage(drawing, 0, 0, size, size);
     if (settings.traceMode === "front") {
       octx.globalCompositeOperation = "multiply";
       drawOutline();
       octx.globalCompositeOperation = "source-over";
     }
+    return out;
+  }
 
-    const found = settings.traceKey && settings.traceMode !== "off" && findPicture(settings.traceKey);
+  $("#saveBtn").onclick = async () => {
+    if (!current) return;
+    let markup = null;
+    if (!current.cat.blank) { try { markup = await loadSource(current.key); } catch { markup = null; } }
+    const out = await compose(null, canvas, markup, SIZE);
     const a = document.createElement("a");
-    a.download = `${found ? found.pic.name : "My Drawing"}.png`;
+    a.download = `${current.cat.blank ? "My Drawing" : current.pic.name}.png`;
     a.href = out.toDataURL("image/png");
     a.click();
   };
+
+  // ---------- Home: categories and pages ----------
+
+  function renderCategories() {
+    const el = $("#categories");
+    el.innerHTML = "";
+    BOOK.forEach((cat) => {
+      const btn = document.createElement("button");
+      btn.className = "cat-btn" + (cat.id === settings.category ? " active" : "");
+      btn.style.setProperty("--c", cat.color);
+      btn.textContent = `${cat.icon} ${cat.name}`;
+      btn.onclick = () => {
+        settings.category = cat.id;
+        saveSettings();
+        renderCategories();
+        renderGallery();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  let galleryToken = 0;
+  function renderGallery() {
+    const token = ++galleryToken;
+    const el = $("#gallery");
+    el.innerHTML = "";
+    const cat = BOOK.find((c) => c.id === settings.category);
+    cat.pictures.forEach((pic) => {
+      const key = keyOf(cat, pic);
+      const card = document.createElement("button");
+      card.className = "card";
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      card.appendChild(thumb);
+      const label = document.createElement("span");
+      label.textContent = pic.name;
+      card.appendChild(label);
+      card.onclick = () => openPage(cat, pic);
+      el.appendChild(card);
+      (async () => {
+        let markup = null;
+        if (!cat.blank) {
+          try { markup = await loadSource(key); } catch { thumb.textContent = "⚠️"; return; }
+        }
+        const blob = await pageGet(key);
+        let drawing = null;
+        if (blob) { try { drawing = await blobToImage(blob); } catch { drawing = null; } }
+        if (token !== galleryToken) return;
+        if (cat.blank && !drawing) { thumb.textContent = "✨"; return; }
+        const c = await compose(null, drawing, markup, 300);
+        if (token !== galleryToken) return;
+        thumb.appendChild(c);
+      })();
+    });
+  }
+
+  async function openPage(cat, pic) {
+    const key = keyOf(cat, pic);
+    if (!cat.blank) {
+      try { await loadSource(key); } catch { alert("Oops! This picture could not be loaded."); return; }
+    }
+    current = { cat, pic, key };
+    undoStack = [];
+    dirty = false;
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    $("#pictureName").textContent = pic.name;
+    renderOverlay();
+    home.classList.remove("active");
+    painter.classList.add("active");
+    const blob = await pageGet(key);
+    if (blob && current && current.key === key) {
+      try {
+        const img = await blobToImage(blob);
+        if (current && current.key === key) ctx.drawImage(img, 0, 0, SIZE, SIZE);
+      } catch { /* ignore broken page */ }
+    }
+  }
+
+  $("#backBtn").onclick = async () => {
+    stroke = null;
+    closeTrace();
+    await persistNow();
+    current = null;
+    painter.classList.remove("active");
+    home.classList.add("active");
+    renderGallery();
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") persistNow();
+  });
+  window.addEventListener("pagehide", () => { persistNow(); });
 
   // ---------- Fullscreen ----------
 
@@ -475,8 +571,8 @@
   renderBrushes();
   renderSizes();
   renderPalette();
-  renderOverlay();
-  restoreDrawing();
+  renderCategories();
+  renderGallery();
 
   if ("serviceWorker" in navigator) {
     const banner = $("#updateBanner");

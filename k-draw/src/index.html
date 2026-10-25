@@ -15,11 +15,21 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <section id="painter" class="screen active">
-    <header class="toolbar">
+  <section id="home" class="screen active">
+    <header class="home-header">
       <h1 class="title">✏️ Draw Fun!</h1>
+      <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+    </header>
+    <nav id="categories" class="categories"></nav>
+    <div id="gallery" class="gallery"></div>
+  </section>
+
+  <section id="painter" class="screen">
+    <header class="toolbar">
+      <button id="backBtn" class="tool" aria-label="Back">⬅️</button>
+      <h2 id="pictureName"></h2>
       <div class="tools">
-        <button id="traceBtn" class="tool" aria-label="Trace a picture">🖼️</button>
+        <button id="traceBtn" class="tool" aria-label="Outline settings">🖼️</button>
         <button id="undoBtn" class="tool" aria-label="Undo">↩️</button>
         <button id="clearBtn" class="tool" aria-label="Start over">🗑️</button>
         <button id="saveBtn" class="tool" aria-label="Save">💾</button>
@@ -39,9 +49,9 @@
   </section>
 
   <div id="traceSheet" class="sheet" hidden>
-    <div class="sheet-body" role="dialog" aria-label="Tracing">
+    <div class="sheet-body" role="dialog" aria-label="Outline settings">
       <header class="sheet-header">
-        <h2>🖼️ Trace</h2>
+        <h2>🖼️ Outline</h2>
         <button id="traceClose" class="tool" aria-label="Close">✕</button>
       </header>
       <div class="trace-settings">
@@ -57,8 +67,6 @@
           <output id="traceOpacityOut"></output>
         </label>
       </div>
-      <nav id="categories" class="categories"></nav>
-      <div id="gallery" class="gallery"></div>
     </div>
   </div>
 
