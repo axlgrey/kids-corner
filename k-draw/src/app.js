@@ -8,6 +8,7 @@
     { id: "pencil", name: "Pencil", icon: "✏️" },
     { id: "pen", name: "Pen", icon: "🖊️" },
     { id: "crayon", name: "Crayon", icon: "🖍️" },
+    { id: "paint", name: "Paint brush", icon: "🖌️" },
     { id: "eraser", name: "Eraser", icon: "🧽" }
   ];
   const SIZES = [6, 12, 22, 36, 56];
@@ -44,18 +45,28 @@
     color: COLORS[13],
     brush: "pen",
     size: 1,
-    traceMode: "front",
-    traceColor: TRACE_COLORS[0],
-    traceOpacity: 50,
     category: BOOK[0].id
   }, read(SETTINGS_KEY) || {});
   if (!COLORS.includes(settings.color)) settings.color = COLORS[13];
   if (!BRUSHES.some((b) => b.id === settings.brush)) settings.brush = "pen";
   if (!(settings.size >= 0 && settings.size < SIZES.length)) settings.size = 1;
-  if (!TRACE_MODES.includes(settings.traceMode)) settings.traceMode = "front";
-  if (!TRACE_COLORS.includes(settings.traceColor)) settings.traceColor = TRACE_COLORS[0];
   if (!BOOK.some((c) => c.id === settings.category)) settings.category = BOOK[0].id;
   const saveSettings = () => write(SETTINGS_KEY, settings);
+
+  const TRACE_KEY = "drawfun-trace-v1";
+  const traces = read(TRACE_KEY) || {};
+  const traceOf = (key) => {
+    const t = Object.assign({ mode: "front", color: TRACE_COLORS[0], opacity: 50 }, traces[key] || {});
+    if (!TRACE_MODES.includes(t.mode)) t.mode = "front";
+    if (!TRACE_COLORS.includes(t.color)) t.color = TRACE_COLORS[0];
+    if (!(t.opacity >= 10 && t.opacity <= 100)) t.opacity = 50;
+    return t;
+  };
+  const saveTrace = () => {
+    if (!current) return;
+    traces[current.key] = current.trace;
+    write(TRACE_KEY, traces);
+  };
 
   // ---------- Page storage (IndexedDB, one PNG blob per page) ----------
 
@@ -197,6 +208,160 @@
     ctx.stroke();
   }
 
+  // Crayon and paint strokes are drawn through an offscreen layer. A per-stroke
+  // coverage mask stops a stroke from darkening where its own segments
+  // overlap, so only separate strokes build up color, like real wax or paint.
+  const makeCanvas = () => {
+    const c = document.createElement("canvas");
+    c.width = c.height = SIZE;
+    return c;
+  };
+  const layer = makeCanvas();
+  const lctx = layer.getContext("2d");
+  const coverage = makeCanvas();
+  const cctx = coverage.getContext("2d");
+
+  const grain = (() => {
+    const tile = 256;
+    const coarseSize = 32;
+    const coarse = new Float32Array(coarseSize * coarseSize).map(() => Math.random());
+    const sample = (x, y) => {
+      const gx = (x / tile) * coarseSize;
+      const gy = (y / tile) * coarseSize;
+      const x0 = Math.floor(gx) % coarseSize;
+      const y0 = Math.floor(gy) % coarseSize;
+      const x1 = (x0 + 1) % coarseSize;
+      const y1 = (y0 + 1) % coarseSize;
+      const fx = gx - Math.floor(gx);
+      const fy = gy - Math.floor(gy);
+      const top = coarse[y0 * coarseSize + x0] * (1 - fx) + coarse[y0 * coarseSize + x1] * fx;
+      const bottom = coarse[y1 * coarseSize + x0] * (1 - fx) + coarse[y1 * coarseSize + x1] * fx;
+      return top * (1 - fy) + bottom * fy;
+    };
+    const c = document.createElement("canvas");
+    c.width = c.height = tile;
+    const gctx = c.getContext("2d");
+    const img = gctx.createImageData(tile, tile);
+    for (let y = 0; y < tile; y++) {
+      for (let x = 0; x < tile; x++) {
+        const fibre = Math.random() * 0.55 + Math.random() * 0.15;
+        const value = sample(x, y) * 0.45 + fibre;
+        const alpha = Math.min(1, Math.max(0, (value - 0.32) * 2.6));
+        img.data[(y * tile + x) * 4 + 3] = Math.round(alpha * 255);
+      }
+    }
+    gctx.putImageData(img, 0, 0);
+    return ctx.createPattern(c, "repeat");
+  })();
+
+  function strokeBounds(a, b, pad) {
+    const x = Math.max(0, Math.floor(Math.min(a.x, b.x) - pad));
+    const y = Math.max(0, Math.floor(Math.min(a.y, b.y) - pad));
+    const right = Math.min(SIZE, Math.ceil(Math.max(a.x, b.x) + pad));
+    const bottom = Math.min(SIZE, Math.ceil(Math.max(a.y, b.y) + pad));
+    return { x, y, w: Math.max(0, right - x), h: Math.max(0, bottom - y) };
+  }
+
+  function layerLine(a, b, width, alpha) {
+    lctx.globalAlpha = alpha;
+    lctx.lineWidth = width;
+    lctx.beginPath();
+    lctx.moveTo(a.x, a.y);
+    lctx.lineTo(b.x, b.y);
+    lctx.stroke();
+  }
+
+  function commitLayer(box, texture, alpha) {
+    if (!box.w || !box.h) return;
+    const { x, y, w, h } = box;
+    lctx.save();
+    lctx.globalAlpha = 1;
+    lctx.globalCompositeOperation = "destination-out";
+    lctx.drawImage(coverage, x, y, w, h, x, y, w, h);
+    cctx.drawImage(layer, x, y, w, h, x, y, w, h);
+    lctx.globalCompositeOperation = "source-in";
+    lctx.fillStyle = settings.color;
+    lctx.fillRect(x, y, w, h);
+    if (texture) {
+      lctx.globalCompositeOperation = "destination-in";
+      lctx.fillStyle = texture;
+      lctx.fillRect(x, y, w, h);
+    }
+    lctx.restore();
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(layer, x, y, w, h, x, y, w, h);
+    ctx.restore();
+  }
+
+  function beginLayerStroke(e) {
+    cctx.clearRect(0, 0, SIZE, SIZE);
+    const size = SIZES[settings.size];
+    const count = Math.max(5, Math.round(size / 3));
+    stroke.travel = 0;
+    stroke.speed = 0;
+    stroke.pressure = e.pointerType === "pen" && e.pressure > 0 ? e.pressure : 0.5;
+    stroke.bristles = Array.from({ length: count }, () => ({
+      offset: Math.random() - 0.5,
+      width: 0.12 + Math.random() * 0.22,
+      alpha: 0.35 + Math.random() * 0.55
+    }));
+  }
+
+  function crayonSegment(a, b, size) {
+    const width = size * 1.1;
+    const box = strokeBounds(a, b, width);
+    lctx.save();
+    lctx.clearRect(box.x, box.y, box.w, box.h);
+    lctx.lineCap = "round";
+    lctx.lineJoin = "round";
+    lctx.strokeStyle = "#000";
+    layerLine(a, b, width * 0.8, 1);
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    const nx = dist ? -(b.y - a.y) / dist : 0;
+    const ny = dist ? (b.x - a.x) / dist : 1;
+    for (let i = 0; i < 4; i++) {
+      const side = (Math.random() - 0.5) * width * 0.75;
+      const wobble = (Math.random() - 0.5) * width * 0.15;
+      layerLine(
+        { x: a.x + nx * side + wobble, y: a.y + ny * side + wobble },
+        { x: b.x + nx * side - wobble, y: b.y + ny * side - wobble },
+        Math.max(1.5, width * (0.08 + Math.random() * 0.12)), 0.8
+      );
+    }
+    lctx.restore();
+    commitLayer(box, grain, 0.92);
+  }
+
+  function paintSegment(a, b, size) {
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    stroke.travel += dist;
+    stroke.speed = stroke.speed * 0.8 + dist * 0.2;
+    const taper = Math.min(1, 0.45 + stroke.travel / (size * 3));
+    const speedScale = Math.min(1.15, Math.max(0.55, 1.2 - stroke.speed / (size * 1.5)));
+    const width = size * 1.3 * taper * speedScale * (0.7 + stroke.pressure * 0.6);
+    const load = Math.max(0.35, 1 - stroke.travel / (SIZE * 2.5));
+    const nx = dist ? -(b.y - a.y) / dist : 0;
+    const ny = dist ? (b.x - a.x) / dist : 1;
+    const box = strokeBounds(a, b, width);
+    lctx.save();
+    lctx.clearRect(box.x, box.y, box.w, box.h);
+    lctx.lineCap = "round";
+    lctx.lineJoin = "round";
+    lctx.strokeStyle = "#000";
+    layerLine(a, b, width * 0.75, 0.55);
+    stroke.bristles.forEach((bristle) => {
+      const off = bristle.offset * width;
+      layerLine(
+        { x: a.x + nx * off, y: a.y + ny * off },
+        { x: b.x + nx * off, y: b.y + ny * off },
+        Math.max(1, width * bristle.width), bristle.alpha
+      );
+    });
+    lctx.restore();
+    commitLayer(box, null, 0.65 + load * 0.3);
+  }
+
   function drawSegment(a, b) {
     const size = SIZES[settings.size];
     ctx.save();
@@ -220,22 +385,13 @@
         strokeLine({ x: a.x + dx, y: a.y + dy }, { x: b.x + dx, y: b.y + dy }, width * 0.4, 0.25);
       }
     } else if (settings.brush === "crayon") {
-      const radius = size * 0.7;
-      const dist = Math.hypot(b.x - a.x, b.y - a.y);
-      const steps = Math.max(1, Math.ceil(dist / Math.max(2, radius * 0.25)));
-      const grains = Math.ceil(radius * 0.9);
-      ctx.globalAlpha = 0.45;
-      for (let s = 0; s < steps; s++) {
-        const t = s / steps;
-        const cx = a.x + (b.x - a.x) * t;
-        const cy = a.y + (b.y - a.y) * t;
-        for (let g = 0; g < grains; g++) {
-          const ang = Math.random() * Math.PI * 2;
-          const r = Math.sqrt(Math.random()) * radius;
-          const dot = 1 + Math.random() * Math.max(1.5, radius * 0.12);
-          ctx.fillRect(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, dot, dot);
-        }
-      }
+      ctx.restore();
+      crayonSegment(a, b, size);
+      return;
+    } else if (settings.brush === "paint") {
+      ctx.restore();
+      paintSegment(a, b, size);
+      return;
     }
     ctx.restore();
   }
@@ -247,6 +403,7 @@
     pushUndo();
     const p = toCanvas(e);
     stroke = { id: e.pointerId, last: p };
+    if (settings.brush === "crayon" || settings.brush === "paint") beginLayerStroke(e);
     drawSegment(p, { x: p.x + 0.1, y: p.y + 0.1 });
   });
 
@@ -255,6 +412,7 @@
     const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
     (events.length ? events : [e]).forEach((ev) => {
       const p = toCanvas(ev);
+      if (ev.pointerType === "pen" && ev.pressure > 0) stroke.pressure = ev.pressure;
       drawSegment(stroke.last, p);
       stroke.last = p;
     });
@@ -281,6 +439,10 @@
     clearTimeout(persistTimer);
     dirty = false;
     undoStack = [];
+    delete traces[current.key];
+    write(TRACE_KEY, traces);
+    current.trace = traceOf(current.key);
+    renderOverlay();
     ctx.clearRect(0, 0, SIZE, SIZE);
     pageDelete(current.key);
   };
@@ -345,34 +507,34 @@
   async function renderOverlay() {
     const token = ++overlayToken;
     const traced = current && !current.cat.blank;
-    const visible = traced && settings.traceMode !== "off";
-    board.classList.toggle("trace-front", settings.traceMode === "front");
+    const visible = traced && current.trace.mode !== "off";
+    board.classList.toggle("trace-front", !!traced && current.trace.mode === "front");
     $("#traceBtn").hidden = !traced;
     if (!visible) { overlay.innerHTML = ""; return; }
     let markup;
     try { markup = await loadSource(current.key); } catch { if (token === overlayToken) overlay.innerHTML = ""; return; }
     if (token !== overlayToken) return;
     overlay.innerHTML = "";
-    overlay.style.opacity = settings.traceOpacity / 100;
-    overlay.appendChild(buildOutline(markup, settings.traceColor));
+    overlay.style.opacity = current.trace.opacity / 100;
+    overlay.appendChild(buildOutline(markup, current.trace.color));
   }
 
   function renderTraceSettings() {
     document.querySelectorAll("#traceMode button").forEach((btn) => {
-      btn.classList.toggle("selected", btn.dataset.mode === settings.traceMode);
+      btn.classList.toggle("selected", btn.dataset.mode === current.trace.mode);
     });
     const colorsEl = $("#traceColors");
     colorsEl.innerHTML = "";
     TRACE_COLORS.forEach((color) => {
       const sw = document.createElement("button");
-      sw.className = "swatch small" + (color === settings.traceColor ? " selected" : "");
+      sw.className = "swatch small" + (color === current.trace.color ? " selected" : "");
       sw.style.background = color;
       sw.setAttribute("aria-label", `Outline ${color}`);
-      sw.onclick = () => { settings.traceColor = color; saveSettings(); renderTraceSettings(); renderOverlay(); };
+      sw.onclick = () => { current.trace.color = color; saveTrace(); renderTraceSettings(); renderOverlay(); };
       colorsEl.appendChild(sw);
     });
-    $("#traceOpacity").value = settings.traceOpacity;
-    $("#traceOpacityOut").textContent = `${settings.traceOpacity}%`;
+    $("#traceOpacity").value = current.trace.opacity;
+    $("#traceOpacityOut").textContent = `${current.trace.opacity}%`;
   }
 
   const sheet = $("#traceSheet");
@@ -382,17 +544,18 @@
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeTrace(); });
   document.querySelectorAll("#traceMode button").forEach((btn) => {
     btn.onclick = () => {
-      settings.traceMode = btn.dataset.mode;
-      saveSettings();
+      current.trace.mode = btn.dataset.mode;
+      saveTrace();
       renderTraceSettings();
       renderOverlay();
     };
   });
   $("#traceOpacity").addEventListener("input", (e) => {
-    settings.traceOpacity = Number(e.target.value);
-    $("#traceOpacityOut").textContent = `${settings.traceOpacity}%`;
-    overlay.style.opacity = settings.traceOpacity / 100;
-    saveSettings();
+    if (!current) return;
+    current.trace.opacity = Number(e.target.value);
+    $("#traceOpacityOut").textContent = `${current.trace.opacity}%`;
+    overlay.style.opacity = current.trace.opacity / 100;
+    saveTrace();
   });
 
   // ---------- Compose (thumbnails and PNG export) ----------
@@ -405,25 +568,25 @@
     try { return await loadImage(url); } finally { URL.revokeObjectURL(url); }
   }
 
-  async function compose(target, drawing, markup, size) {
+  async function compose(target, drawing, markup, size, trace) {
     const out = target || document.createElement("canvas");
     out.width = out.height = size;
     const octx = out.getContext("2d");
     octx.fillStyle = "#fff";
     octx.fillRect(0, 0, size, size);
     let outline = null;
-    if (markup && settings.traceMode !== "off") {
-      try { outline = await outlineImage(markup, settings.traceColor); } catch { outline = null; }
+    if (markup && trace.mode !== "off") {
+      try { outline = await outlineImage(markup, trace.color); } catch { outline = null; }
     }
     const drawOutline = () => {
       if (!outline) return;
-      octx.globalAlpha = settings.traceOpacity / 100;
+      octx.globalAlpha = trace.opacity / 100;
       octx.drawImage(outline, 0, 0, size, size);
       octx.globalAlpha = 1;
     };
-    if (settings.traceMode === "behind") drawOutline();
+    if (trace.mode === "behind") drawOutline();
     if (drawing) octx.drawImage(drawing, 0, 0, size, size);
-    if (settings.traceMode === "front") {
+    if (trace.mode === "front") {
       octx.globalCompositeOperation = "multiply";
       drawOutline();
       octx.globalCompositeOperation = "source-over";
@@ -435,7 +598,7 @@
     if (!current) return;
     let markup = null;
     if (!current.cat.blank) { try { markup = await loadSource(current.key); } catch { markup = null; } }
-    const out = await compose(null, canvas, markup, SIZE);
+    const out = await compose(null, canvas, markup, SIZE, current.trace);
     const a = document.createElement("a");
     a.download = `${current.cat.blank ? "My Drawing" : current.pic.name}.png`;
     a.href = out.toDataURL("image/png");
@@ -490,7 +653,7 @@
         if (blob) { try { drawing = await blobToImage(blob); } catch { drawing = null; } }
         if (token !== galleryToken) return;
         if (cat.blank && !drawing) { thumb.textContent = "✨"; return; }
-        const c = await compose(null, drawing, markup, 300);
+        const c = await compose(null, drawing, markup, 300, traceOf(key));
         if (token !== galleryToken) return;
         thumb.appendChild(c);
       })();
@@ -502,7 +665,7 @@
     if (!cat.blank) {
       try { await loadSource(key); } catch { alert("Oops! This picture could not be loaded."); return; }
     }
-    current = { cat, pic, key };
+    current = { cat, pic, key, trace: traceOf(key) };
     undoStack = [];
     dirty = false;
     ctx.clearRect(0, 0, SIZE, SIZE);

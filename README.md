@@ -15,7 +15,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | App | Folder | What it does |
 |---|---|---|
 | Color Fun! | [`k-color/src/`](k-color/src/) | Pick a picture and tap areas to color them in. |
-| Draw Fun! | [`k-draw/src/`](k-draw/src/) | Draw freehand with pencils, pens and crayons, or trace pictures. |
+| Draw Fun! | [`k-draw/src/`](k-draw/src/) | A drawing book: pick a blank page or a picture to trace, and draw freehand. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 
 ## Color Fun!
@@ -48,12 +48,20 @@ SVG conventions:
 
 ## Draw Fun!
 
-- Brushes: pencil (soft, grainy), pen (solid), crayon (waxy texture) and
-  eraser, in 5 sizes with a 15-color palette.
-- Tracing: pick one of 34 pictures and show its outline in front of or
-  behind the drawing, with adjustable outline color and opacity.
-- Undo (last 20 strokes), start over, save as a PNG and fullscreen mode.
-- The drawing and settings are saved on the device.
+- Opens as a drawing book: pick a category, then a page. Previews show each
+  page with the drawing made on it so far.
+- 8 blank pages, plus 34 pictures to trace in 5 categories: animals,
+  transport, food, nature and places.
+- Every page keeps its own drawing, saved on the device as you draw, so kids
+  can come back to any page later.
+- Brushes: pencil (soft, grainy), pen (solid), crayon (waxy texture), paint
+  brush (bristle streaks that taper and fade, pressure-sensitive with a
+  stylus) and eraser, in 5 sizes with a 15-color palette.
+- On picture pages the outline can be shown in front of the drawing (without
+  covering it), behind it, or turned off, with adjustable color and opacity.
+  Each page remembers its own outline settings.
+- Undo (last 20 strokes), start over (clears the page and resets its outline
+  settings; cannot be undone), save as a PNG and fullscreen mode.
 - Works fully offline, with the same update banner as Color Fun!.
 
 ### Adding Tracing Pictures
