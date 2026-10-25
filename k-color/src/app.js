@@ -1,8 +1,20 @@
 (() => {
   const COLORS = [
-    "#e63946", "#ff7b00", "#ffbe0b", "#fff275", "#8ac926", "#2a9d8f",
-    "#4cc9f0", "#3a86ff", "#8338ec", "#ff70a6", "#a0522d", "#f4c095",
-    "#9e9e9e", "#222222", "#ffffff"
+    "#e63946", "#ffb3c1",
+    "#ff7b00", "#ffc999",
+    "#ffbe0b", "#fff275",
+    "#d4a017", "#fff8e1",
+    "#8ac926", "#c7f2a4",
+    "#2a9d8f", "#2d6a4f",
+    "#00b4a6", "#a0f0e8",
+    "#4cc9f0", "#bde0fe",
+    "#3a86ff", "#1d3557",
+    "#8338ec", "#cdb4db",
+    "#ff70a6", "#d6247a",
+    "#a0522d", "#f4c095",
+    "#6f4518", "#ffe0bd",
+    "#9e9e9e", "#dddddd",
+    "#222222", "#ffffff"
   ];
   const STORAGE_KEY = "colorfun-v2";
   const SVG_NS = "http://www.w3.org/2000/svg";

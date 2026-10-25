@@ -171,13 +171,18 @@ html, body {
 .canvas svg .f { cursor: pointer; transition: fill .15s; }
 
 .palette {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, auto);
+  justify-content: safe center;
   gap: clamp(6px, 1.5vw, 12px);
-  padding: 10px max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding: 12px max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   background: rgba(255, 255, 255, .6);
 }
+.palette::-webkit-scrollbar { display: none; }
 .swatch {
   width: clamp(38px, 9vw, 58px);
   height: clamp(38px, 9vw, 58px);
@@ -213,17 +218,21 @@ html, body {
   .canvas { padding: 1%; }
   .palette {
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, auto);
+    grid-template-rows: none;
     grid-auto-rows: auto;
-    align-content: center;
-    gap: clamp(4px, 1.5vh, 10px);
+    align-content: safe center;
+    justify-content: center;
+    overflow-x: hidden;
+    gap: clamp(4px, 1.5vh, 8px);
     padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) 8px;
     border-radius: 24px 0 0 24px;
     overflow-y: auto;
   }
   .swatch {
-    width: clamp(30px, 14vh, 52px);
-    height: clamp(30px, 14vh, 52px);
+    width: clamp(30px, 12vh, 46px);
+    height: clamp(30px, 12vh, 46px);
   }
 }
 
