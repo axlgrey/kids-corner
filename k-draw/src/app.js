@@ -221,9 +221,8 @@
   const coverage = makeCanvas();
   const cctx = coverage.getContext("2d");
 
-  const grain = (() => {
+  const makeGrain = (coarseSize, mix, threshold, gain) => {
     const tile = 256;
-    const coarseSize = 32;
     const coarse = new Float32Array(coarseSize * coarseSize).map(() => Math.random());
     const sample = (x, y) => {
       const gx = (x / tile) * coarseSize;
@@ -245,14 +244,16 @@
     for (let y = 0; y < tile; y++) {
       for (let x = 0; x < tile; x++) {
         const fibre = Math.random() * 0.55 + Math.random() * 0.15;
-        const value = sample(x, y) * 0.45 + fibre;
-        const alpha = Math.min(1, Math.max(0, (value - 0.32) * 2.6));
+        const value = sample(x, y) * mix + fibre;
+        const alpha = Math.min(1, Math.max(0, (value - threshold) * gain));
         img.data[(y * tile + x) * 4 + 3] = Math.round(alpha * 255);
       }
     }
     gctx.putImageData(img, 0, 0);
     return ctx.createPattern(c, "repeat");
-  })();
+  };
+  const grain = makeGrain(32, 0.45, 0.32, 2.6);
+  const paperTooth = makeGrain(128, 0.6, 0.38, 1.8);
 
   function strokeBounds(a, b, pad) {
     const x = Math.max(0, Math.floor(Math.min(a.x, b.x) - pad));
@@ -333,6 +334,65 @@
     commitLayer(box, grain, 0.92);
   }
 
+  // Ink pen: width follows speed (fast = thin, slow = full) with smoothing,
+  // so handwriting and signatures get natural thick and thin strokes.
+  function penSegment(a, b, size) {
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    stroke.speed = stroke.speed * 0.85 + dist * 0.15;
+    const maxW = Math.max(2, size * 0.9);
+    const minW = maxW * 0.3;
+    const speedScale = Math.max(0, Math.min(1, 1 - stroke.speed / (size * 2.5)));
+    const pressureScale = 0.6 + stroke.pressure * 0.8;
+    const target = Math.min(maxW * 1.3, (minW + (maxW - minW) * speedScale) * pressureScale);
+    const startW = stroke.inkWidth ?? target * 0.6;
+    const endW = startW + (target - startW) * 0.3;
+    stroke.inkWidth = endW;
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.strokeStyle = settings.color;
+    ctx.globalAlpha = 1;
+    const steps = Math.max(1, Math.ceil(dist / 2));
+    for (let i = 0; i < steps; i++) {
+      const t0 = i / steps;
+      const t1 = (i + 1) / steps;
+      ctx.lineWidth = startW + (endW - startW) * t1;
+      ctx.beginPath();
+      ctx.moveTo(a.x + (b.x - a.x) * t0, a.y + (b.y - a.y) * t0);
+      ctx.lineTo(a.x + (b.x - a.x) * t1, a.y + (b.y - a.y) * t1);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Pencil: soft graphite that catches the paper tooth, lighter when moving
+  // fast, and builds up gradually with repeated strokes for shading.
+  function pencilSegment(a, b, size) {
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    stroke.speed = stroke.speed * 0.8 + dist * 0.2;
+    const width = Math.max(2.5, size * 0.55) * (0.75 + stroke.pressure * 0.5);
+    const box = strokeBounds(a, b, width * 1.5);
+    const nx = dist ? -(b.y - a.y) / dist : 0;
+    const ny = dist ? (b.x - a.x) / dist : 1;
+    lctx.save();
+    lctx.clearRect(box.x, box.y, box.w, box.h);
+    lctx.lineCap = "round";
+    lctx.lineJoin = "round";
+    lctx.strokeStyle = "#000";
+    layerLine(a, b, width * 0.55, 1);
+    layerLine(a, b, width, 0.45);
+    for (let i = 0; i < 3; i++) {
+      const side = (Math.random() - 0.5) * width * 0.9;
+      layerLine(
+        { x: a.x + nx * side, y: a.y + ny * side },
+        { x: b.x + nx * side, y: b.y + ny * side },
+        Math.max(0.8, width * 0.12), 0.5
+      );
+    }
+    lctx.restore();
+    const light = Math.min(0.3, stroke.speed / (size * 8));
+    commitLayer(box, paperTooth, (0.35 + stroke.pressure * 0.4) - light);
+  }
+
   function paintSegment(a, b, size) {
     const dist = Math.hypot(b.x - a.x, b.y - a.y);
     stroke.travel += dist;
@@ -374,16 +434,13 @@
       ctx.globalCompositeOperation = "destination-out";
       strokeLine(a, b, size * 1.5, 1);
     } else if (settings.brush === "pen") {
-      strokeLine(a, b, size, 1);
+      ctx.restore();
+      penSegment(a, b, size);
+      return;
     } else if (settings.brush === "pencil") {
-      const width = Math.max(2, size * 0.6);
-      strokeLine(a, b, width, 0.7);
-      const jitter = width * 0.35;
-      for (let i = 0; i < 2; i++) {
-        const dx = (Math.random() - 0.5) * jitter;
-        const dy = (Math.random() - 0.5) * jitter;
-        strokeLine({ x: a.x + dx, y: a.y + dy }, { x: b.x + dx, y: b.y + dy }, width * 0.4, 0.25);
-      }
+      ctx.restore();
+      pencilSegment(a, b, size);
+      return;
     } else if (settings.brush === "crayon") {
       ctx.restore();
       crayonSegment(a, b, size);
@@ -403,7 +460,7 @@
     pushUndo();
     const p = toCanvas(e);
     stroke = { id: e.pointerId, last: p };
-    if (settings.brush === "crayon" || settings.brush === "paint") beginLayerStroke(e);
+    beginLayerStroke(e);
     drawSegment(p, { x: p.x + 0.1, y: p.y + 0.1 });
   });
 
