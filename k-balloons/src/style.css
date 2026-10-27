@@ -21,7 +21,7 @@ body {
   display: flex;
   flex-direction: column;
   height: var(--app-height, 100vh);
-  padding: env(safe-area-inset-top) 0 0 0;
+  padding: 0;
 }
 
 button { font-family: inherit; cursor: pointer; color: #333; }
@@ -44,7 +44,7 @@ button { font-family: inherit; cursor: pointer; color: #333; }
 
 .hud {
   position: absolute;
-  top: 8px;
+  top: max(8px, env(safe-area-inset-top));
   left: max(8px, env(safe-area-inset-left));
   right: max(8px, env(safe-area-inset-right));
   display: flex;
@@ -100,7 +100,7 @@ button { font-family: inherit; cursor: pointer; color: #333; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px max(12px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   background: rgba(0, 0, 0, 0.15);
   overflow-y: auto;
 }
@@ -201,10 +201,6 @@ h2 { margin: 12px 0 6px; font-size: 1.2rem; color: #3a86ff; }
   font-weight: bold;
 }
 .update-close { border: none; background: none; font-size: 1.2rem; }
-
-@media (orientation: landscape) {
-  body { padding-top: 0; }
-}
 
 @media (orientation: landscape) and (max-height: 500px) {
   .panel { padding: 8px 14px; width: min(560px, 100%); }

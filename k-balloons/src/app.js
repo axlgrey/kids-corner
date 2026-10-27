@@ -275,7 +275,23 @@
   };
 
   // ---- Input ----
+  const menuTap = (x, y) => {
+    effects.push({ type: "tap", x, y, radius: 22 * unit, life: 0.25, max: 0.25 });
+    let target = null;
+    let best = Infinity;
+    balloons.forEach((b) => {
+      const d = dist(x, y, b.x, b.y);
+      if (d < b.r * 1.15 && d < best) { best = d; target = b; }
+    });
+    if (!target) return;
+    removeBalloon(target);
+    const sound = Sfx.randomPop();
+    Sfx.play(sound);
+    popEffect(target, sound);
+  };
+
   const tap = (x, y) => {
+    if (state === "menu") { menuTap(x, y); return; }
     if (state !== "play") return;
     const strong = powers.strong > 0;
     const reach = strong ? 1.6 : 1.15;
