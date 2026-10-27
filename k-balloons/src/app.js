@@ -750,24 +750,30 @@
 
   // ---- Init ----
   let lockedWidth = 0;
-  let fsSettling = false;
+  let fsSettling = true;
+  // iOS needs the height locked to the width (k-piano pattern). Android
+  // changes only the height when system bars hide (fullscreen display at
+  // startup, fullscreen button), so it always follows innerHeight.
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const lockHeight = () => {
-    if (window.innerWidth !== lockedWidth || fsSettling) {
+    if (!isIOS || window.innerWidth !== lockedWidth || fsSettling) {
       lockedWidth = window.innerWidth;
       document.documentElement.style.setProperty("--app-height", window.innerHeight + "px");
     }
     resize();
   };
-  // Entering/leaving fullscreen changes only the height, and Android settles
-  // the final size a little later, so re-measure for a short while.
-  const onFullscreenChange = () => {
+  const settle = () => {
     fsSettling = true;
     lockHeight();
-    [50, 150, 300, 600].forEach((ms) => setTimeout(lockHeight, ms));
-    setTimeout(() => { fsSettling = false; }, 700);
+    [50, 150, 300, 600, 1000].forEach((ms) => setTimeout(lockHeight, ms));
+    setTimeout(() => { fsSettling = false; }, 1100);
   };
-  lockHeight();
+  const onFullscreenChange = settle;
+  settle();
   window.addEventListener("resize", lockHeight);
+  window.addEventListener("load", settle);
+  window.addEventListener("pageshow", settle);
   document.addEventListener("fullscreenchange", onFullscreenChange);
   document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
