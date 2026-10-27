@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#3a86ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Balloon Pop">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Balloon Pop!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <canvas id="game" class="game"></canvas>
+
+    <header id="hud" class="hud" hidden>
+      <button id="pauseBtn" class="tool" aria-label="Pause">⏸️</button>
+      <div class="hud-info">
+        <span id="scoreText" class="pill">⭐ 0</span>
+        <span id="timeText" class="pill">⏱️ 3:00</span>
+        <span id="livesText" class="pill">❤️❤️❤️</span>
+      </div>
+      <div id="powerText" class="powers"></div>
+    </header>
+
+    <section id="menu" class="overlay">
+      <div class="panel">
+        <h1 class="title">🎈 Balloon Pop!</h1>
+        <div class="tools-row">
+          <button id="soundBtn" class="tool" aria-label="Sound">🔊</button>
+          <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+        </div>
+        <h2>⏱️ 3 Minute Game</h2>
+        <div class="modes">
+          <button class="mode-btn easy" data-mode="normal" data-diff="easy">🐣 Easy<small data-best="normal-easy"></small></button>
+          <button class="mode-btn normal" data-mode="normal" data-diff="normal">🐶 Normal<small data-best="normal-normal"></small></button>
+          <button class="mode-btn hard" data-mode="normal" data-diff="hard">🦁 Hard<small data-best="normal-hard"></small></button>
+        </div>
+        <h2>♾️ Endless</h2>
+        <div class="modes">
+          <button class="mode-btn endless" data-mode="endless">❤️❤️❤️ Endless<small data-best="endless"></small></button>
+        </div>
+        <p class="hint">Tap balloons to pop them! 🎁 gives power-ups.</p>
+      </div>
+    </section>
+
+    <section id="pause" class="overlay" hidden>
+      <div class="panel">
+        <h1 class="title">⏸️ Paused</h1>
+        <button id="resumeBtn" class="big-btn">▶️ Keep playing</button>
+        <button id="quitBtn" class="big-btn alt">🏠 Menu</button>
+      </div>
+    </section>
+
+    <section id="over" class="overlay" hidden>
+      <div class="panel">
+        <h1 id="overTitle" class="title">🎉 Time's up!</h1>
+        <div id="overStars" class="stars">⭐⭐⭐</div>
+        <p id="overScore" class="final">0</p>
+        <p id="overBest" class="best"></p>
+        <button id="againBtn" class="big-btn">🔁 Play again</button>
+        <button id="homeBtn" class="big-btn alt">🏠 Menu</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ A new version is ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
