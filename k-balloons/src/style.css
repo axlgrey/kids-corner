@@ -1,5 +1,10 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+:root {
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -16,7 +21,7 @@ body {
   display: flex;
   flex-direction: column;
   height: var(--app-height, 100vh);
-  padding: max(0px, env(safe-area-inset-top)) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  padding: env(safe-area-inset-top) 0 0 0;
 }
 
 button { font-family: inherit; cursor: pointer; color: #333; }
@@ -40,8 +45,8 @@ button { font-family: inherit; cursor: pointer; color: #333; }
 .hud {
   position: absolute;
   top: 8px;
-  left: 8px;
-  right: 8px;
+  left: max(8px, env(safe-area-inset-left));
+  right: max(8px, env(safe-area-inset-right));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -95,7 +100,7 @@ button { font-family: inherit; cursor: pointer; color: #333; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 12px max(28px, env(safe-area-inset-bottom));
+  padding: 12px max(12px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   background: rgba(0, 0, 0, 0.15);
   overflow-y: auto;
 }

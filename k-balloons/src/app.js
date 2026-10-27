@@ -16,6 +16,8 @@
   let H = 0;
   let DPR = 1;
   let unit = 1;
+  let safeL = 0;
+  let safeR = 0;
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
@@ -25,6 +27,9 @@
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const css = getComputedStyle(document.documentElement);
+    safeL = parseFloat(css.getPropertyValue("--safe-l")) || 0;
+    safeR = parseFloat(css.getPropertyValue("--safe-r")) || 0;
     unit = Math.max(0.7, Math.min(1.4, Math.min(W, H) / 420));
   };
 
@@ -87,7 +92,7 @@
     const base = 34 * unit * cfg.size * scale;
     const b = {
       kind,
-      x: x ?? rand(base + 8, W - base - 8),
+      x: x ?? rand(safeL + base + 8, Math.max(safeL + base + 9, W - safeR - base - 8)),
       y: y ?? H + base * 2,
       r: base,
       vy: -cfg.speed * unit * rand(0.8, 1.2) * level(),
@@ -333,7 +338,7 @@
         b.vy = Math.min(b.vy * 0.99, -60 * unit);
       }
       b.x += Math.sin(b.phase) * b.sway * dt;
-      b.x = Math.max(b.r, Math.min(W - b.r, b.x));
+      b.x = Math.max(safeL + b.r, Math.min(W - safeR - b.r, b.x));
       if (b.hit > 0) b.hit -= dt;
       if (b.wiggle > 0) b.wiggle = Math.max(0, b.wiggle - dt * 3);
       if (b.y < -b.r * 3) {
