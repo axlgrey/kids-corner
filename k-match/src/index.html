@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff9f1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Match It">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Match It!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <section id="menu" class="screen">
+      <div class="page">
+        <h1 class="title">🧩 Match It!</h1>
+        <div class="tools-row">
+          <button class="tool sound-btn" aria-label="Sound">🔊</button>
+          <button class="tool voice-btn" aria-label="Voice">🗣️</button>
+          <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+          <button id="stickerBtn" class="tool" aria-label="Sticker book">📒</button>
+        </div>
+        <div class="play-style" role="radiogroup">
+          <button class="style-btn" data-style="pick">👆 Pick</button>
+          <button class="style-btn" data-style="lines">✏️ Draw lines</button>
+        </div>
+        <div id="categories" class="categories"></div>
+        <p class="hint">Pick a page and find the match! Collect stickers 🌟</p>
+      </div>
+    </section>
+
+    <section id="game" class="screen" hidden>
+      <header class="bar">
+        <button id="homeBtn" class="tool" aria-label="Menu">🏠</button>
+        <div id="progress" class="progress"></div>
+        <button class="tool sound-btn" aria-label="Sound">🔊</button>
+      </header>
+      <div id="board" class="board"></div>
+      <div id="buddy" class="buddy" aria-hidden="true">🐸</div>
+    </section>
+
+    <section id="done" class="overlay" hidden>
+      <div class="panel">
+        <h1 class="title">🎉 Great job!</h1>
+        <div id="doneStars" class="stars">⭐⭐⭐</div>
+        <p class="sticker-msg">You got a sticker!</p>
+        <div id="doneSticker" class="sticker-big">🦄</div>
+        <button id="againBtn" class="big-btn">🔁 Play again</button>
+        <button id="menuBtn" class="big-btn alt">🏠 Menu</button>
+      </div>
+    </section>
+
+    <section id="book" class="overlay" hidden>
+      <div class="panel">
+        <h1 class="title">📒 My Stickers</h1>
+        <p id="bookCount" class="best"></p>
+        <div id="bookGrid" class="book-grid"></div>
+        <button id="bookClose" class="big-btn alt">👍 Close</button>
+      </div>
+    </section>
+
+    <div id="fx" class="fx" aria-hidden="true"></div>
+  </main>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ A new version is ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="sound.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
