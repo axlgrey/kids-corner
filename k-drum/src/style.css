@@ -271,7 +271,7 @@ button { font-family: inherit; cursor: pointer; }
   /* Short landscape: toolbar, kits and rhythm bar share one row. */
   body {
     display: grid;
-    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas: "song chips tools" "stage stage stage";
     align-items: center;
@@ -280,7 +280,12 @@ button { font-family: inherit; cursor: pointer; }
   .title { display: none; }
   .chips { grid-area: chips; padding: 4px; min-width: 0; }
   .song-bar { grid-area: song; padding: 4px 8px; }
-  .song-select { flex-basis: 180px; }
+  .song-bar { gap: 4px; min-width: 0; }
+  .song-select { flex: 0 1 160px; }
+  .song-hint { font-size: 0.9rem; }
+  .chips { justify-self: stretch; }
+  .views { margin-right: 4px; }
+  .tools { gap: 4px; }
   .stage { grid-area: stage; align-self: stretch; padding-top: 4px; }
 }
 

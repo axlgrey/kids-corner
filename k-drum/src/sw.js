@@ -1,6 +1,6 @@
 // Service worker: precaches the whole app so it works fully offline.
 // Bump VERSION whenever files change to force clients to refresh the cache.
-const VERSION = "v5";
+const VERSION = "v6";
 const CACHE = `drumfun-${VERSION}`;
 
 const APP_FILES = [
