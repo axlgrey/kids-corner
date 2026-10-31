@@ -107,9 +107,14 @@ button { font-family: inherit; cursor: pointer; }
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: clamp(8px, 2.5vw, 18px);
+  --gap: clamp(8px, 2.5vmin, 18px);
+  --cols: 4;
+  --rows: 2;
+  --size: min((100cqw - var(--gap) * (var(--cols) - 1)) / var(--cols), (100cqh - 16px - var(--gap) * (var(--rows) - 1)) / var(--rows));
+  gap: var(--gap);
+  place-content: center;
+  grid-template-columns: repeat(var(--cols), var(--size));
+  grid-template-rows: repeat(var(--rows), var(--size));
   touch-action: none;
 }
 
@@ -127,12 +132,11 @@ button { font-family: inherit; cursor: pointer; }
   justify-content: center;
   touch-action: none;
   transition: transform 0.05s;
-  aspect-ratio: 1;
-  max-width: 100%;
-  max-height: 100%;
-  justify-self: center;
-  align-self: center;
+  width: 100%;
+  height: 100%;
 }
+.pads .pad-icon { font-size: calc(var(--size) * 0.3); }
+.pads .pad-label { font-size: clamp(0.8rem, calc(var(--size) * 0.1), 1.4rem); }
 .pad > span, .piece > span { pointer-events: none; }
 .pad-icon { font-size: clamp(1.6rem, 7vmin, 3.4rem); line-height: 1; }
 .pad-label {
@@ -174,10 +178,7 @@ button { font-family: inherit; cursor: pointer; }
 .demo .pads, .demo .kitview, .demo .machine { pointer-events: none; }
 
 @media (orientation: portrait) {
-  .pads {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-  }
+  .pads { --cols: 2; --rows: 4; }
 }
 
 .burst {
@@ -266,14 +267,29 @@ button { font-family: inherit; cursor: pointer; }
   .song-bar { padding: 4px 12px; }
   .song-select { height: 40px; }
   .chip { padding: 4px 10px; font-size: 0.9rem; }
+
+  /* Short landscape: toolbar, kits and rhythm bar share one row. */
+  body {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "song chips tools" "stage stage stage";
+    align-items: center;
+  }
+  .toolbar { grid-area: tools; justify-self: end; padding: 4px 8px; }
+  .title { display: none; }
+  .chips { grid-area: chips; padding: 4px; min-width: 0; }
+  .song-bar { grid-area: song; padding: 4px 8px; }
+  .song-select { flex-basis: 180px; }
+  .stage { grid-area: stage; align-self: stretch; padding-top: 4px; }
 }
 
 /* ---- Drum-kit view ---- */
 .kitview {
   isolation: isolate;
   position: relative;
-  width: min(100cqw, 160cqh);
-  aspect-ratio: 16 / 10;
+  width: min(100cqw, 220cqh);
+  aspect-ratio: 22 / 10;
   margin: auto;
   touch-action: none;
 }

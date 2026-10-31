@@ -147,16 +147,16 @@
   const KEYMAP = "qwerasdf";
 
   // Drum-kit view: slot i holds pad i. x/y/w are percent of the kit box
-  // (landscape 16:10, portrait 3:4); shape picks how the piece is drawn.
+  // (landscape 22:10, portrait 3:4); shape picks how the piece is drawn.
   const SLOTS = [
-    { shape: "cymbal", l: [14, 18, 22], p: [22, 11, 36] },
-    { shape: "cymbal", l: [12, 50, 18], p: [16, 38, 28] },
-    { shape: "drum", l: [38, 30, 17], p: [42, 30, 24] },
-    { shape: "cymbal", l: [86, 20, 24], p: [79, 11, 36] },
-    { shape: "drum", l: [24, 74, 20], p: [22, 62, 30] },
-    { shape: "drum", l: [62, 30, 17], p: [68, 30, 24] },
-    { shape: "drum", l: [77, 70, 22], p: [80, 58, 28] },
-    { shape: "kick", l: [50, 66, 30], p: [50, 82, 40] }
+    { shape: "cymbal", l: [17, 18, 18], p: [22, 11, 36] },
+    { shape: "cymbal", l: [8, 48, 14], p: [16, 38, 28] },
+    { shape: "drum", l: [39, 30, 13], p: [42, 30, 24] },
+    { shape: "cymbal", l: [85, 20, 19], p: [79, 11, 36] },
+    { shape: "drum", l: [24, 66, 15], p: [22, 62, 30] },
+    { shape: "drum", l: [61, 30, 13], p: [68, 30, 24] },
+    { shape: "drum", l: [77, 66, 17], p: [80, 58, 28] },
+    { shape: "kick", l: [50, 68, 22], p: [50, 82, 40] }
   ];
 
   const renderPads = () => {
