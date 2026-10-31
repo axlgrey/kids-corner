@@ -4,7 +4,7 @@
   const saved = (() => {
     try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; }
   })();
-  const settings = { kit: "drums", labels: true, view: "kit", bpm: 100, patterns: {}, ...saved };
+  const settings = { kit: "drums", labels: true, view: "kit", bpm: 100, steps: 8, patterns: {}, ...saved };
   if (!["kit", "pads", "machine"].includes(settings.view)) settings.view = "kit";
   const persist = () => {
     try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
@@ -359,7 +359,7 @@
   };
 
   // ---- Drum machine (step sequencer) ----
-  const STEPS = 8;
+  const steps = () => (settings.steps === 16 ? 16 : 8);
   const DEFAULT_PATTERNS = {
     drums: { hihat: [1, 1, 1, 1, 1, 1, 1, 1], snare: [0, 0, 1, 0, 0, 0, 1, 0], kick: [1, 0, 0, 0, 1, 1, 0, 0] },
     percussion: { shaker: [1, 1, 1, 1, 1, 1, 1, 1], bongohi: [1, 0, 1, 0, 0, 1, 0, 0], conga: [0, 0, 0, 1, 0, 0, 1, 0] },
@@ -377,10 +377,19 @@
     const id = settings.kit;
     const saved = settings.patterns[id];
     const pads = KITS[id].pads;
+    const n = steps();
     if (!saved || saved.length !== pads.length) {
       const preset = DEFAULT_PATTERNS[id] || {};
-      settings.patterns[id] = pads.map((p) => (preset[p.id] || []).concat(Array(STEPS).fill(0)).slice(0, STEPS));
+      settings.patterns[id] = pads.map((p) => (preset[p.id] || []).concat(Array(8).fill(0)).slice(0, 8));
     }
+    // Convert between 8 and 16 steps: 8 -> 16 spreads hits to every other
+    // step; 16 -> 8 keeps the hits on the eighth notes.
+    settings.patterns[id] = settings.patterns[id].map((row) => {
+      if (row.length === n) return row;
+      if (row.length * 2 === n) return row.flatMap((v) => [v, 0]);
+      if (row.length === n * 2) return row.filter((_, i) => i % 2 === 0);
+      return Array(n).fill(0);
+    });
     return settings.patterns[id];
   };
 
@@ -399,24 +408,54 @@
       head.onpointerdown = (e) => { e.preventDefault(); hit(pad.id); };
       grid.appendChild(head);
       cells[r] = [];
-      for (let c = 0; c < STEPS; c++) {
+      for (let c = 0; c < steps(); c++) {
         const cell = document.createElement("button");
-        cell.className = "seq-cell" + (c % 4 === 0 ? " beat" : "") + (rows[r][c] ? " on" : "");
+        cell.className = "seq-cell" + (Math.floor(c / (steps() / 4)) % 2 === 0 ? " beat" : "") + (rows[r][c] ? " on" : "");
+        cell.dataset.r = r;
+        cell.dataset.c = c;
         cell.style.setProperty("--color", pad.color);
         cell.setAttribute("aria-label", `${pad.name} step ${c + 1}`);
-        cell.onpointerdown = (e) => {
-          e.preventDefault();
-          rows[r][c] = rows[r][c] ? 0 : 1;
-          cell.classList.toggle("on", !!rows[r][c]);
-          persist();
-          if (rows[r][c] && !seqTimer) { audio(); pad.play(ctx.currentTime); }
-        };
         grid.appendChild(cell);
         cells[r][c] = cell;
       }
     });
+    grid.style.setProperty("--steps", steps());
     syncLabels();
   };
+
+  // Press a cell to toggle it, then drag to paint the same on/off state
+  // across other cells.
+  const painters = new Map();
+  const paint = (cell, value) => {
+    const r = +cell.dataset.r;
+    const c = +cell.dataset.c;
+    const rows = pattern();
+    if (rows[r][c] === value) return;
+    rows[r][c] = value;
+    cell.classList.toggle("on", !!value);
+    if (value && !seqTimer) { audio(); kit().pads[r].play(ctx.currentTime); }
+  };
+  const cellAt = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    return el && el.classList.contains("seq-cell") && grid.contains(el) ? el : null;
+  };
+  grid.addEventListener("pointerdown", (e) => {
+    const cell = e.target.closest(".seq-cell");
+    if (!cell) return;
+    e.preventDefault();
+    const value = pattern()[+cell.dataset.r][+cell.dataset.c] ? 0 : 1;
+    painters.set(e.pointerId, value);
+    paint(cell, value);
+  });
+  grid.addEventListener("pointermove", (e) => {
+    if (!painters.has(e.pointerId)) return;
+    const cell = cellAt(e.clientX, e.clientY);
+    if (cell) paint(cell, painters.get(e.pointerId));
+  });
+  const endPaint = (e) => {
+    if (painters.delete(e.pointerId)) persist();
+  };
+  ["pointerup", "pointercancel"].forEach((t) => grid.addEventListener(t, endPaint));
 
   const showStep = (step) => {
     cells.forEach((row) => row.forEach((cell, c) => {
@@ -432,14 +471,14 @@
   // Look-ahead scheduler: audio is timed by the AudioContext clock,
   // the playhead follows with setTimeout.
   const tick = () => {
-    const stepLen = 60 / settings.bpm / 2;
+    const stepLen = 60 / settings.bpm / (steps() / 4);
     while (nextTime < ctx.currentTime + 0.12) {
       const step = seqStep;
       const rows = pattern();
       kit().pads.forEach((pad, r) => { if (rows[r][step]) pad.play(nextTime); });
       setTimeout(() => { if (seqTimer) showStep(step); }, Math.max(0, (nextTime - ctx.currentTime) * 1000));
       nextTime += stepLen;
-      seqStep = (seqStep + 1) % STEPS;
+      seqStep = (seqStep + 1) % steps();
     }
   };
 
@@ -469,11 +508,24 @@
     settings.bpm = Math.min(160, Math.max(60, settings.bpm + delta));
     persist();
     syncTempo();
+  syncSteps();
   };
 
   playBtn.onclick = () => (seqTimer ? stopSeq() : startSeq());
   $("#slowerBtn").onclick = () => changeTempo(-10);
   $("#fasterBtn").onclick = () => changeTempo(10);
+  const stepsBtn = $("#stepsBtn");
+  const syncSteps = () => {
+    stepsBtn.textContent = steps() === 16 ? "1/16" : "1/8";
+    stepsBtn.setAttribute("aria-label", steps() === 16 ? "Sixteenth notes" : "Eighth notes");
+  };
+  stepsBtn.onclick = () => {
+    settings.steps = steps() === 16 ? 8 : 16;
+    if (seqStep >= steps()) seqStep = 0;
+    persist();
+    syncSteps();
+    renderMachine();
+  };
   $("#clearBtn").onclick = () => {
     pattern().forEach((row) => row.fill(0));
     persist();
@@ -545,6 +597,7 @@
   if (!KITS[settings.kit]) settings.kit = "drums";
   renderKits();
   syncTempo();
+  syncSteps();
   syncView();
   renderPads();
   startRhythm("");
