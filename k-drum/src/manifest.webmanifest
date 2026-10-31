@@ -1,0 +1,16 @@
+{
+  "name": "Drum Fun!",
+  "short_name": "Drum Fun",
+  "description": "A kid-friendly drum kit. Tap colorful pads, play drums and percussion, and learn simple rhythms.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff3c4",
+  "theme_color": "#e63946",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

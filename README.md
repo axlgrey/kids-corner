@@ -9,6 +9,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Balloon Pop!: <https://axlgrey.github.io/kids-corner/k-balloons/src/>
 - Color Fun!: <https://axlgrey.github.io/kids-corner/k-color/src/>
 - Draw Fun!: <https://axlgrey.github.io/kids-corner/k-draw/src/>
+- Drum Fun!: <https://axlgrey.github.io/kids-corner/k-drum/src/>
 - Match It!: <https://axlgrey.github.io/kids-corner/k-match/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 
@@ -19,6 +20,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Balloon Pop! | [`k-balloons/src/`](k-balloons/src/) | A balloon popping game with funny sounds and power-ups. |
 | Color Fun! | [`k-color/src/`](k-color/src/) | Pick a picture and tap areas to color them in. |
 | Draw Fun! | [`k-draw/src/`](k-draw/src/) | A drawing book: pick a blank page or a picture to trace, and draw freehand. |
+| Drum Fun! | [`k-drum/src/`](k-drum/src/) | Tap colorful pads, play drums and percussion, and learn simple rhythms. |
 | Match It! | [`k-match/src/`](k-match/src/) | An activity book: match words, numbers, letters, colors and shadows to pictures. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e63946">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Drum Fun">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Drum Fun!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <h1 class="title">🥁 Drum Fun!</h1>
+    <div class="tools">
+      <div class="views" role="group" aria-label="View">
+        <button class="tool" data-view="kit" aria-label="Drum kit">🥁</button>
+        <button class="tool" data-view="pads" aria-label="Pads">🔲</button>
+        <button class="tool" data-view="machine" aria-label="Drum machine">🎛️</button>
+      </div>
+      <button id="labelBtn" class="tool" aria-label="Pad names">🔤</button>
+      <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+    </div>
+  </header>
+
+  <nav id="kits" class="chips" aria-label="Kits"></nav>
+
+  <div id="songBar" class="song-bar">
+    <select id="rhythmSelect" class="song-select" aria-label="Rhythm"></select>
+    <button id="listenBtn" class="tool" aria-label="Listen" hidden>👂</button>
+    <button id="restartBtn" class="tool" aria-label="Start again" hidden>🔁</button>
+    <span id="rhythmHint" class="song-hint"></span>
+  </div>
+
+  <div id="seqControls" class="song-bar" hidden>
+    <button id="playBtn" class="tool" aria-label="Play">▶️</button>
+    <button id="slowerBtn" class="tool" aria-label="Slower">🐢</button>
+    <span id="tempoLabel" class="song-hint tempo"></span>
+    <button id="fasterBtn" class="tool" aria-label="Faster">🐇</button>
+    <button id="clearBtn" class="tool" aria-label="Clear">🧽</button>
+  </div>
+
+  <main class="stage">
+    <div id="pads" class="pads"></div>
+  </main>
+
+  <div id="celebrate" class="celebrate" hidden>
+    <div class="celebrate-box">
+      <div class="stars">⭐⭐⭐</div>
+      <p>Great job!</p>
+      <button id="againBtn" class="big-btn">Play again</button>
+      <button id="freeBtn" class="big-btn alt">Free play</button>
+    </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ A new version is ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="rhythms.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
