@@ -27,10 +27,10 @@
   <circle class="w" cx="73" cy="90" r="3"/>
   <circle class="w" cx="109" cy="90" r="3"/>
   <!-- blush -->
-  <ellipse cx="60" cy="112" rx="8" ry="5"/>
-  <ellipse cx="128" cy="112" rx="8" ry="5"/>
+  <ellipse cx="66" cy="122" rx="8" ry="5"/>
+  <ellipse cx="122" cy="122" rx="8" ry="5"/>
   <!-- nose & mouth -->
   <path d="M88 108 L100 108 L94 114 Z"/>
   <path class="n" d="M94 114 Q89 121 84 117 M94 114 Q99 121 104 117"/>
-  <path class="n" stroke-width="2" d="M70 112 L50 108 M70 118 L50 120 M118 112 L138 108 M118 118 L138 120"/>
+  <path class="n" stroke-width="2" d="M68 106 L42 100 M68 112 L42 114 M120 106 L146 100 M120 112 L146 114"/>
 </svg>
