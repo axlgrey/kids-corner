@@ -4,7 +4,7 @@
   const saved = (() => {
     try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; }
   })();
-  const settings = { kit: "drums", labels: true, view: "kit", bpm: 100, steps: 8, patterns: {}, ...saved };
+  const settings = { kit: "drums", labels: true, view: "kit", bpm: 100, steps: 8, patterns: {}, mute: {}, solo: {}, ...saved };
   if (!["kit", "pads", "machine"].includes(settings.view)) settings.view = "kit";
   const persist = () => {
     try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
@@ -365,6 +365,55 @@
     percussion: { shaker: [1, 1, 1, 1, 1, 1, 1, 1], bongohi: [1, 0, 1, 0, 0, 1, 0, 0], conga: [0, 0, 0, 1, 0, 0, 1, 0] },
     silly: { pop: [1, 0, 1, 0, 1, 0, 1, 0], boing: [1, 0, 0, 0, 1, 0, 0, 0], quack: [0, 0, 1, 0, 0, 0, 1, 1] }
   };
+  // Loop presets: one 16-step string per pad ("x" = hit, "." = rest).
+  // Loops without hits on the in-between steps load as 8 steps.
+  const LOOPS = {
+    drums: [
+      { name: "🎸 Rock", bpm: 110, rows: { hihat: "x.x.x.x.x.x.x.x.", snare: "....x.......x...", kick: "x.......x.x....." } },
+      { name: "🕺 Disco", bpm: 120, rows: { hihat: "..x...x...x...x.", clap: "....x.......x...", kick: "x...x...x...x...", crash: "x..............." } },
+      { name: "🎤 Hip Hop", bpm: 90, rows: { hihat: "x.x.x.x.x.x.x.x.", snare: "....x.......x...", kick: "x......x..x....." } },
+      { name: "🔁 Funky", bpm: 100, rows: { hihat: "xxxxxxxxxxxxxxxx", snare: "....x..x.x..x...", kick: "x.x.......x..x.." } },
+      { name: "🌴 Reggae", bpm: 80, rows: { ride: "x.x.x.x.x.x.x.x.", snare: "........x.......", kick: "........x......." } },
+      { name: "🥁 Tom Party", bpm: 110, rows: { tom: "x.x.....x.x.....", floor: "....x.x.....x.x.", kick: "x.......x.......", crash: "x..............." } }
+    ],
+    percussion: [
+      { name: "💃 Samba", bpm: 100, rows: { shaker: "xxxxxxxxxxxxxxxx", bongohi: "x..x..x...x..x..", conga: "......x.......x.", cowbell: "x...x.x.x...x.x." } },
+      { name: "🌶️ Salsa", bpm: 110, rows: { woodblock: "x..x..x...x.x...", cowbell: "x.x.x.x.x.x.x.x.", conga: "......xx......xx", bongolo: "...x.......x...." } },
+      { name: "🔔 Jingle", bpm: 100, rows: { tambourine: "x.x.x.x.x.x.x.x.", triangle: "x.......x.......", bongolo: "....x.......x..." } },
+      { name: "🐘 Jungle", bpm: 90, rows: { conga: "x..x..x.x..x..x.", bongohi: "..x...x...x...x.", bongolo: "x.......x.......", shaker: "x.x.x.x.x.x.x.x." } }
+    ],
+    silly: [
+      { name: "🐸 Frog Dance", bpm: 110, rows: { boing: "x...x...x...x...", pop: "..x...x...x...x.", quack: "........x.x....." } },
+      { name: "🚀 Space", bpm: 120, rows: { laser: "x..x..x.x..x..x.", zap: "....x.......x...", bubble: "xxxxxxxxxxxxxxxx", whoosh: "x..............." } },
+      { name: "🦆 Duck Parade", bpm: 100, rows: { quack: "x.x.x...x.x.x...", ding: "x.......x.......", pop: "....x.......x..." } }
+    ]
+  };
+  const loopSelect = $("#loopSelect");
+  const renderLoops = () => {
+    loopSelect.innerHTML = '<option value="">🎶 Loops</option>';
+    (LOOPS[settings.kit] || []).forEach((loop, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = loop.name;
+      loopSelect.appendChild(opt);
+    });
+  };
+  loopSelect.onchange = () => {
+    const loop = (LOOPS[settings.kit] || [])[loopSelect.value];
+    loopSelect.value = "";
+    if (!loop) return;
+    const rows = KITS[settings.kit].pads.map((p) => (loop.rows[p.id] || "").padEnd(16, ".").split("").map((ch) => (ch === "x" ? 1 : 0)));
+    const sixteenths = rows.some((row) => row.some((v, i) => v && i % 2));
+    settings.steps = sixteenths ? 16 : 8;
+    settings.patterns[settings.kit] = sixteenths ? rows : rows.map((row) => row.filter((_, i) => i % 2 === 0));
+    settings.bpm = loop.bpm;
+    if (seqStep >= steps()) seqStep = 0;
+    persist();
+    syncTempo();
+    syncSteps();
+    renderMachine();
+    if (!seqTimer) startSeq();
+  };
   const seqControls = $("#seqControls");
   const playBtn = $("#playBtn");
   const tempoLabel = $("#tempoLabel");
@@ -393,6 +442,36 @@
     return settings.patterns[id];
   };
 
+  // Mute/solo per kit row. If any row is soloed, only soloed rows play;
+  // otherwise every row that is not muted plays.
+  const trackFlags = (key) => {
+    const n = kit().pads.length;
+    const store = settings[key] || (settings[key] = {});
+    const flags = store[settings.kit];
+    if (!Array.isArray(flags) || flags.length !== n) store[settings.kit] = Array(n).fill(0);
+    return store[settings.kit];
+  };
+  const audible = (r) => {
+    const solo = trackFlags("solo");
+    return solo.some(Boolean) ? !!solo[r] : !trackFlags("mute")[r];
+  };
+  const syncTracks = () => {
+    const mute = trackFlags("mute");
+    const solo = trackFlags("solo");
+    grid.querySelectorAll(".seq-ms").forEach((box) => {
+      const r = +box.dataset.r;
+      box.querySelector(".mute").classList.toggle("on", !!mute[r]);
+      box.querySelector(".solo").classList.toggle("on", !!solo[r]);
+    });
+    cells.forEach((row, r) => row.forEach((cell) => cell.classList.toggle("silent", !audible(r))));
+  };
+  const toggleTrack = (key, r) => {
+    const flags = trackFlags(key);
+    flags[r] = flags[r] ? 0 : 1;
+    persist();
+    syncTracks();
+  };
+
   const renderMachine = () => {
     grid.innerHTML = "";
     grid.className = "machine";
@@ -407,6 +486,18 @@
       head.setAttribute("aria-label", pad.name);
       head.onpointerdown = (e) => { e.preventDefault(); hit(pad.id); };
       grid.appendChild(head);
+      const ms = document.createElement("div");
+      ms.className = "seq-ms";
+      ms.dataset.r = r;
+      [["mute", "M", "Mute"], ["solo", "S", "Solo"]].forEach(([key, text, label]) => {
+        const btn = document.createElement("button");
+        btn.className = key;
+        btn.textContent = text;
+        btn.setAttribute("aria-label", `${label} ${pad.name}`);
+        btn.onclick = () => toggleTrack(key, r);
+        ms.appendChild(btn);
+      });
+      grid.appendChild(ms);
       cells[r] = [];
       for (let c = 0; c < steps(); c++) {
         const cell = document.createElement("button");
@@ -420,6 +511,7 @@
       }
     });
     grid.style.setProperty("--steps", steps());
+    syncTracks();
     syncLabels();
   };
 
@@ -475,7 +567,7 @@
     while (nextTime < ctx.currentTime + 0.12) {
       const step = seqStep;
       const rows = pattern();
-      kit().pads.forEach((pad, r) => { if (rows[r][step]) pad.play(nextTime); });
+      kit().pads.forEach((pad, r) => { if (rows[r][step] && audible(r)) pad.play(nextTime); });
       setTimeout(() => { if (seqTimer) showStep(step); }, Math.max(0, (nextTime - ctx.currentTime) * 1000));
       nextTime += stepLen;
       seqStep = (seqStep + 1) % steps();

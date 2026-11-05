@@ -55,6 +55,11 @@ window.MatchData = (() => {
     ["🐿️", "🌰", "squirrel", "nut"], ["🐱", "🧶", "cat", "yarn"], ["🐟", "🫧", "fish", "bubbles"]
   ];
 
+  const BODY = [
+    ["head", "🧑"], ["shoulders", "🤷"], ["knees", "🦵"], ["toes", "🦶"],
+    ["hand", "✋"], ["ears", "👂"], ["eyes", "👀"]
+  ];
+
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
   const CATEGORIES = [
@@ -104,6 +109,13 @@ window.MatchData = (() => {
       pool: () => FRIENDS.map(([a, b, from, to]) => ({
         key: a, kind: "emoji", prompt: a, answer: b, say: to, from,
         reveal: `${from} and ${to}!`
+      }))
+    },
+    {
+      id: "body", name: "My Body", icon: "👀", color: "#ff70a6",
+      ask: (it) => `Where are the ${it.say}?`.replace("are the head", "is the head").replace("are the hand", "is the hand"),
+      pool: () => BODY.map(([part, emoji]) => ({
+        key: part, kind: "word", prompt: part, answer: emoji, say: part
       }))
     },
     {
