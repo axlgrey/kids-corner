@@ -44,12 +44,20 @@
     <button id="fasterBtn" class="tool" aria-label="Faster">🐇</button>
     <button id="stepsBtn" class="tool steps-btn" aria-label="Eighth notes">1/8</button>
     <button id="clearBtn" class="tool" aria-label="Clear">🧽</button>
-    <select id="loopSelect" class="song-select loop-select" aria-label="Loops"></select>
+    <button id="loopBtn" class="tool" aria-label="Loops">🎶</button>
   </div>
 
   <main class="stage">
     <div id="pads" class="pads"></div>
   </main>
+
+  <div id="loopMenu" class="celebrate loop-menu" hidden>
+    <div class="celebrate-box">
+      <p>🎶 Loops</p>
+      <div id="loopList" class="loop-list"></div>
+      <button id="loopClose" class="big-btn alt">Close</button>
+    </div>
+  </div>
 
   <div id="celebrate" class="celebrate" hidden>
     <div class="celebrate-box">

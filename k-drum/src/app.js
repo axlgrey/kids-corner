@@ -388,20 +388,9 @@
       { name: "🦆 Duck Parade", bpm: 100, rows: { quack: "x.x.x...x.x.x...", ding: "x.......x.......", pop: "....x.......x..." } }
     ]
   };
-  const loopSelect = $("#loopSelect");
-  const renderLoops = () => {
-    loopSelect.innerHTML = '<option value="">🎶 Loops</option>';
-    (LOOPS[settings.kit] || []).forEach((loop, i) => {
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = loop.name;
-      loopSelect.appendChild(opt);
-    });
-  };
-  loopSelect.onchange = () => {
-    const loop = (LOOPS[settings.kit] || [])[loopSelect.value];
-    loopSelect.value = "";
-    if (!loop) return;
+  const loopMenu = $("#loopMenu");
+  const loopList = $("#loopList");
+  const loadLoop = (loop) => {
     const rows = KITS[settings.kit].pads.map((p) => (loop.rows[p.id] || "").padEnd(16, ".").split("").map((ch) => (ch === "x" ? 1 : 0)));
     const sixteenths = rows.some((row) => row.some((v, i) => v && i % 2));
     settings.steps = sixteenths ? 16 : 8;
@@ -414,6 +403,20 @@
     renderMachine();
     if (!seqTimer) startSeq();
   };
+  const openLoops = () => {
+    loopList.innerHTML = "";
+    (LOOPS[settings.kit] || []).forEach((loop) => {
+      const btn = document.createElement("button");
+      btn.className = "big-btn loop-item";
+      btn.textContent = loop.name;
+      btn.onclick = () => { loopMenu.hidden = true; loadLoop(loop); };
+      loopList.appendChild(btn);
+    });
+    loopMenu.hidden = false;
+  };
+  $("#loopBtn").onclick = openLoops;
+  $("#loopClose").onclick = () => { loopMenu.hidden = true; };
+  loopMenu.onclick = (e) => { if (e.target === loopMenu) loopMenu.hidden = true; };
   const seqControls = $("#seqControls");
   const playBtn = $("#playBtn");
   const tempoLabel = $("#tempoLabel");
