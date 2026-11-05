@@ -198,6 +198,8 @@ const MODELS = {
     const b = add(g, new THREE.TorusGeometry(0.16, 0.04, 10, 20, Math.PI * 0.8), mat(0xffe066), 0, 0.2, 0);
     b.rotation.z = Math.PI + Math.PI * 0.1;
     b.scale.set(1, 1, 0.9);
+    // Cap the open ends of the partial torus so they don't look hollow.
+    for (const t of [0, Math.PI * 0.8]) add(b, sphere(0.04, 10), mat(0xffe066), 0.16 * Math.cos(t), 0.16 * Math.sin(t), 0);
     add(g, cyl(0.012, 0.02, 0.05, 6), mat(0x6f4518), 0.15, 0.24, 0).rotation.z = 0.6;
     add(g, sphere(0.02, 6), mat(0x6f4518), -0.15, 0.24, 0);
     return g;

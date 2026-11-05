@@ -362,7 +362,7 @@ const REACTIONS = {
   },
   door(o) {
     const h = o.userData.hinge;
-    animate(h, 2.2, (k) => { h.rotation.y = -Math.sin(k * Math.PI) * 1.2; }, () => { h.rotation.y = 0; });
+    animate(h, 2.2, (k) => { h.rotation.y = Math.sin(k * Math.PI) * 1.2; }, () => { h.rotation.y = 0; });
     setTimeout(() => {
       const p = toScreen(o);
       if (!p.behind) addBits(p.x, p.y - 40, ["👻", "🐭", "🦖", "🐵"], 1, 10);

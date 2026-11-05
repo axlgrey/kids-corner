@@ -235,6 +235,12 @@ export const buildRoom = (scene) => {
   add(hinge, box(0.05, 2.0, 0.9), mat(0x9c6644), 0, 1.0, -0.45);
   add(hinge, sphere(0.04, 10), mat(0xffd60a), -0.05, 1.0, -0.8);
   door.userData.hinge = hinge;
+  // Dark doorway seen when the door swings open, plus a frame around it.
+  add(door, box(0.01, 2.0, 0.9), mat(0x2b2d42), 0.012, 1.0, 0);
+  const trim = mat(0xfaf3dd);
+  add(door, box(0.06, 2.1, 0.08), trim, -0.03, 1.05, -0.49);
+  add(door, box(0.06, 2.1, 0.08), trim, -0.03, 1.05, 0.49);
+  add(door, box(0.06, 0.08, 1.06), trim, -0.03, 2.06, 0);
 
   // Sofa (south)
   const sofa = thing(scene, "squash", "PFFFT!", "fart");
@@ -291,7 +297,7 @@ export const buildRoom = (scene) => {
   }
   for (let i = 0; i < 3; i++) add(shelf, box(0.07, 0.3, 0.26), mat(bookCols[4 - i]), -0.55 + i * 0.08, 1.32, 0);
   spot(-half + 0.22, 0.08, 0.05, false, 0.75);
-  spot(-half + 0.22, 0.63, -0.1, false, 0.75);
+  spot(-half + 0.22, 0.63, 0.6, false, 0.75);
   spot(-half + 0.22, 1.18, 0.55, false, 0.75);
   spot(-half + 0.22, 1.73, 0.2, false, 0.75);
 
