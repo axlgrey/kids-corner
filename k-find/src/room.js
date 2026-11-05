@@ -154,9 +154,9 @@ export const buildRoom = (scene) => {
   for (const x of [-0.75, 0.75]) for (const z of [-0.9, 0.9]) add(bed, box(0.08, 0.3, 0.08), wood, x, 0.15, z);
   add(bed, box(1.6, 0.12, 1.9), wood, 0, 0.32, 0);
   add(bed, box(1.5, 0.14, 1.8), mat(0xffffff), 0, 0.45, 0);
-  add(bed, box(1.55, 0.06, 1.2), mat(0x70d6ff), 0, 0.53, 0.3);
+  add(bed, box(1.56, 0.06, 1.24), mat(0x70d6ff), 0, 0.535, 0.29);
   add(bed, box(1.6, 0.8, 0.08), wood, 0, 0.55, -0.95);
-  const pillow = add(bed, box(0.6, 0.12, 0.35), mat(0xfff0f6), -0.35, 0.58, -0.65);
+  const pillow = add(bed, box(0.6, 0.12, 0.35), mat(0xfff0f6), -0.35, 0.585, -0.65);
   pillow.rotation.y = 0.1;
   spot(-1.2, 0.56, -1.6);
   spot(-2.1, 0.64, -2.6, false, 0.9);
