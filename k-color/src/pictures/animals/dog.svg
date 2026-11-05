@@ -8,12 +8,12 @@
   <!-- body -->
   <path d="M54 184 Q46 132 96 126 Q146 132 140 184 Z"/>
   <ellipse cx="96" cy="160" rx="22" ry="20"/>
-  <!-- collar -->
-  <path d="M60 128 Q96 142 132 128 L132 138 Q96 152 60 138 Z"/>
-  <circle cx="96" cy="150" r="7"/>
   <!-- paws -->
   <ellipse cx="72" cy="186" rx="16" ry="9"/>
   <ellipse cx="120" cy="186" rx="16" ry="9"/>
+  <!-- collar -->
+  <path d="M64 118 Q96 134 128 118 L128 130 Q96 146 64 130 Z"/>
+  <circle cx="96" cy="144" r="6"/>
   <!-- head -->
   <ellipse cx="96" cy="78" rx="52" ry="48"/>
   <!-- eye patch -->
