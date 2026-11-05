@@ -28,7 +28,9 @@ const shuffle = (list) => {
 const DIFF = {
   easy:   { count: 3, decoys: 0, hidden: false, scale: 1.35, hintAfter: 12 },
   normal: { count: 5, decoys: 3, hidden: false, scale: 1.1,  hintAfter: 20 },
-  hard:   { count: 7, decoys: 5, hidden: true,  scale: 0.9,  hintAfter: 35 }
+  hard:   { count: 7, decoys: 5, hidden: true,  scale: 0.9,  hintAfter: 35 },
+  // Free play: every item is out, no target, timer or hints; tap anything.
+  free:   { count: 0, decoys: 99, hidden: false, scale: 1.2, hintAfter: Infinity, free: true }
 };
 const NOPE_WORDS = ["Oops!", "Not that!", "Try again!", "Hmm, no!", "Silly!"];
 const YAY_WORDS = ["You found it!", "Yay!", "Hooray!", "Great job!", "Super!", "Wow!"];
@@ -492,6 +494,8 @@ const startGame = async (newDiff) => {
   state = "play";
   if (settings.gyro && deviceQuat) setGyro(true);
   Sfx.play("start");
+  syncFree();
+  if (cfg.free) { current = null; say("Look around and tap everything!"); return; }
   nextTarget();
 };
 
@@ -510,6 +514,26 @@ const nextTarget = () => {
   void t.offsetWidth;
   t.classList.add("bump");
   say(`Can you find the ${it.name}?`);
+};
+
+const syncFree = () => {
+  const free = !!DIFF[diff].free;
+  $("#countText").hidden = free;
+  $("#hintBtn").hidden = free;
+  if (free) {
+    $("#targetEmoji").textContent = "🎈";
+    $("#targetName").textContent = "anything";
+    $(".target-text").firstChild.textContent = "Tap ";
+  } else $(".target-text").firstChild.textContent = "Find the ";
+};
+
+const playItem = (it, x, y) => {
+  const { item, obj } = it;
+  Sfx.play(item.sound, panOf(obj));
+  addWord(x, y - 30, pick(item.words), pick(["#ffd60a", "#ff70a6", "#70d6ff", "#8ac926"]), 2);
+  addBits(x, y, CONFETTI, 8, 120);
+  hop(obj, 0.3, 1);
+  say(`The ${item.name}!`);
 };
 
 const endGame = () => {
@@ -581,7 +605,8 @@ const tap = (x, y) => {
   }
 
   if (item && state === "play") {
-    if (item === current) foundItem(item, x, y);
+    if (DIFF[diff].free) playItem(item, x, y);
+    else if (item === current) foundItem(item, x, y);
     else wrongItem(item, x, y);
     return;
   }

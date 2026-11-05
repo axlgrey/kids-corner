@@ -199,7 +199,7 @@ h2 { margin: 12px 0 6px; font-size: 1.2rem; color: #3a86ff; }
 .tools-row { display: flex; justify-content: center; gap: 10px; }
 .hint { margin: 12px 0 0; font-size: 0.95rem; color: #555; }
 
-.modes { display: flex; gap: 8px; margin-top: 14px; }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .mode-btn {
   flex: 1;
   display: flex;
@@ -220,6 +220,7 @@ h2 { margin: 12px 0 6px; font-size: 1.2rem; color: #3a86ff; }
 .mode-btn.easy { background: #8ac926; }
 .mode-btn.normal { background: #3a86ff; }
 .mode-btn.hard { background: #e63946; }
+.mode-btn.free { flex-basis: 100%; background: #9d4edd; }
 
 .stars { font-size: 2.6rem; }
 .final { margin: 4px 0; font-size: 2.4rem; font-weight: bold; }
