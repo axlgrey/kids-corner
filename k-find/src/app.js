@@ -60,6 +60,7 @@ scene.add(cat);
 let yaw = 0;
 let pitch = -0.15;
 let yawOffset = 0;
+let pitchOffset = 0;
 let gyroOn = false;
 let gyroSeen = false;
 let deviceQuat = null;
@@ -71,6 +72,8 @@ const tmpEuler = new THREE.Euler();
 const tmpQuat = new THREE.Quaternion();
 const yawQuat = new THREE.Quaternion();
 const yAxis = new THREE.Vector3(0, 1, 0);
+const xAxis = new THREE.Vector3(1, 0, 0);
+const pitchQuat = new THREE.Quaternion();
 
 const screenAngle = () => {
   const o = (screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0;
@@ -98,7 +101,7 @@ const deviceYaw = () => new THREE.Euler().setFromQuaternion(deviceQuat, "YXZ").y
 
 const setGyro = (on) => {
   gyroOn = on && !!deviceQuat;
-  if (gyroOn) yawOffset = yaw - deviceYaw();
+  if (gyroOn) { yawOffset = yaw - deviceYaw(); pitchOffset = 0; }
   else if (deviceQuat) {
     const e = new THREE.Euler().setFromQuaternion(camera.quaternion, "YXZ");
     yaw = e.y;
@@ -131,7 +134,8 @@ $("#gyroBtn").onclick = () => {
 const updateCamera = (dt) => {
   if (gyroOn && deviceQuat) {
     yawQuat.setFromAxisAngle(yAxis, yawOffset);
-    tmpQuat.copy(yawQuat).multiply(deviceQuat);
+    pitchQuat.setFromAxisAngle(xAxis, pitchOffset);
+    tmpQuat.copy(yawQuat).multiply(deviceQuat).multiply(pitchQuat);
     camera.quaternion.slerp(tmpQuat, Math.min(1, dt * 18));
   } else {
     camera.rotation.set(pitch, yaw, 0, "YXZ");
@@ -176,7 +180,10 @@ canvas.addEventListener("pointermove", (e) => {
   }
   dragMoved += Math.abs(dx) + Math.abs(dy);
   const speed = (camera.fov / 70) * 0.005;
-  if (gyroOn) yawOffset += dx * speed;
+  if (gyroOn) {
+    yawOffset += dx * speed;
+    pitchOffset = THREE.MathUtils.clamp(pitchOffset + dy * speed, -1, 1);
+  }
   else {
     yaw += dx * speed;
     pitch = THREE.MathUtils.clamp(pitch + dy * speed, -1.3, 1.3);
