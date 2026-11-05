@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- sky -->
+  <rect x="0" y="0" width="200" height="200"/>
+  <!-- stars -->
+  <path d="M30 26 L33 34 L41 34 L35 39 L37 47 L30 42 L23 47 L25 39 L19 34 L27 34 Z"/>
+  <circle cx="172" cy="30" r="5"/>
+  <!-- light beam -->
+  <path d="M80 124 L120 124 L156 196 L44 196 Z"/>
+  <!-- dome -->
+  <path d="M60 86 Q60 40 100 40 Q140 40 140 86 Z"/>
+  <!-- alien -->
+  <ellipse cx="100" cy="68" rx="18" ry="16"/>
+  <path class="n" d="M92 54 L86 42 M108 54 L114 42"/>
+  <circle cx="86" cy="42" r="4"/>
+  <circle cx="114" cy="42" r="4"/>
+  <circle class="k" cx="93" cy="66" r="4"/>
+  <circle class="k" cx="107" cy="66" r="4"/>
+  <path class="n" stroke-width="2" d="M94 76 Q100 80 106 76"/>
+  <!-- saucer -->
+  <ellipse cx="100" cy="98" rx="84" ry="24"/>
+  <ellipse cx="100" cy="120" rx="34" ry="8"/>
+  <!-- lights -->
+  <circle cx="44" cy="100" r="7"/>
+  <circle cx="72" cy="106" r="7"/>
+  <circle cx="100" cy="108" r="7"/>
+  <circle cx="128" cy="106" r="7"/>
+  <circle cx="156" cy="100" r="7"/>
+</svg>

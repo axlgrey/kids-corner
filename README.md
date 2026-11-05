@@ -41,8 +41,8 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 
 ## Color Fun!
 
-- 34 line-art pictures in 5 categories: animals, transport, food, nature and
-  places.
+- 46 line-art pictures in 6 categories: animals, transport, food, nature,
+  places and space.
 - Big color swatches, undo, clear, save as image and fullscreen mode.
 - Colorings are saved on the device, so kids can come back to them later.
 - Works fully offline once loaded; a banner offers to refresh when a new

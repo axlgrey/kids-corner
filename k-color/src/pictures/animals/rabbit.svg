@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- grass -->
+  <path d="M0 182 Q100 172 200 182 L200 200 L0 200 Z"/>
+  <!-- carrot -->
+  <path d="M152 150 L188 158 L162 196 Z"/>
+  <path d="M152 150 Q140 136 146 130 Q154 136 156 146 Z"/>
+  <path d="M156 150 Q156 132 164 132 Q166 142 160 152 Z"/>
+  <!-- body -->
+  <ellipse cx="94" cy="156" rx="46" ry="34"/>
+  <ellipse cx="94" cy="162" rx="24" ry="20"/>
+  <!-- tail -->
+  <circle cx="44" cy="168" r="12"/>
+  <!-- feet -->
+  <ellipse cx="68" cy="188" rx="20" ry="8"/>
+  <ellipse cx="120" cy="188" rx="20" ry="8"/>
+  <!-- ears -->
+  <ellipse cx="72" cy="40" rx="15" ry="38"/>
+  <ellipse cx="116" cy="40" rx="15" ry="38"/>
+  <ellipse cx="72" cy="42" rx="7" ry="28"/>
+  <ellipse cx="116" cy="42" rx="7" ry="28"/>
+  <!-- head -->
+  <ellipse cx="94" cy="100" rx="46" ry="40"/>
+  <!-- eyes -->
+  <ellipse class="k" cx="76" cy="94" rx="7" ry="9"/>
+  <ellipse class="k" cx="112" cy="94" rx="7" ry="9"/>
+  <circle class="w" cx="73" cy="90" r="3"/>
+  <circle class="w" cx="109" cy="90" r="3"/>
+  <!-- blush -->
+  <ellipse cx="60" cy="112" rx="8" ry="5"/>
+  <ellipse cx="128" cy="112" rx="8" ry="5"/>
+  <!-- nose & mouth -->
+  <path d="M88 108 L100 108 L94 114 Z"/>
+  <path class="n" d="M94 114 Q89 121 84 117 M94 114 Q99 121 104 117"/>
+  <path class="n" stroke-width="2" d="M70 112 L50 108 M70 118 L50 120 M118 112 L138 108 M118 118 L138 120"/>
+</svg>

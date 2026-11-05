@@ -12,7 +12,11 @@ const CATEGORIES = [
       { id: "lion", name: "Lion" },
       { id: "panther", name: "Panther" },
       { id: "hamster", name: "Hamster" },
-      { id: "mouse", name: "Mouse" }
+      { id: "mouse", name: "Mouse" },
+      { id: "bear", name: "Bear" },
+      { id: "dog", name: "Dog" },
+      { id: "rabbit", name: "Rabbit" },
+      { id: "duck", name: "Duck" }
     ]
   },
   {
@@ -58,7 +62,20 @@ const CATEGORIES = [
       { id: "pizza", name: "Pizza" },
       { id: "donut", name: "Donut" },
       { id: "watermelon", name: "Watermelon" },
-      { id: "cake", name: "Cake" }
+      { id: "cake", name: "Cake" },
+      { id: "orange", name: "Orange" },
+      { id: "pear", name: "Pear" },
+      { id: "banana", name: "Banana" },
+      { id: "strawberry", name: "Strawberry" }
+    ]
+  },
+  {
+    id: "space", name: "Space", icon: "🌙", color: "#5a4fcf",
+    pictures: [
+      { id: "moon", name: "Moon" },
+      { id: "star", name: "Star" },
+      { id: "planet", name: "Planet" },
+      { id: "ufo", name: "UFO" }
     ]
   }
 ];

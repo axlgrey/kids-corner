@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- table -->
+  <path d="M0 176 L200 176 L200 200 L0 200 Z"/>
+  <!-- berry -->
+  <path d="M100 186 Q40 150 36 92 Q36 56 72 52 Q88 50 100 60 Q112 50 128 52 Q164 56 164 92 Q160 150 100 186 Z"/>
+  <!-- seeds -->
+  <ellipse cx="70" cy="90" rx="3" ry="5"/>
+  <ellipse cx="100" cy="88" rx="3" ry="5"/>
+  <ellipse cx="130" cy="90" rx="3" ry="5"/>
+  <ellipse cx="82" cy="118" rx="3" ry="5"/>
+  <ellipse cx="118" cy="118" rx="3" ry="5"/>
+  <ellipse cx="100" cy="146" rx="3" ry="5"/>
+  <ellipse cx="62" cy="122" rx="3" ry="5"/>
+  <ellipse cx="138" cy="122" rx="3" ry="5"/>
+  <!-- leaves -->
+  <path d="M100 62 Q70 70 56 54 Q74 44 100 50 Q126 44 144 54 Q130 70 100 62 Z"/>
+  <path d="M100 52 Q86 34 92 26 Q100 36 104 50 Z"/>
+  <!-- stem -->
+  <path d="M98 30 L96 12 L104 12 L104 30 Z"/>
+</svg>

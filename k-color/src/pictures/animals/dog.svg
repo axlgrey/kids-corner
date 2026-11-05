@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- grass -->
+  <path d="M0 182 Q100 172 200 182 L200 200 L0 200 Z"/>
+  <!-- bone -->
+  <path d="M146 176 L178 176 Q182 168 188 172 Q194 178 188 182 Q194 186 188 192 Q182 196 178 188 L146 188 Q142 196 136 192 Q130 186 136 182 Q130 178 136 172 Q142 168 146 176 Z"/>
+  <!-- tail -->
+  <path d="M136 150 Q166 140 162 108 Q170 108 172 118 Q174 150 140 164 Z"/>
+  <!-- body -->
+  <path d="M54 184 Q46 132 96 126 Q146 132 140 184 Z"/>
+  <ellipse cx="96" cy="160" rx="22" ry="20"/>
+  <!-- collar -->
+  <path d="M60 128 Q96 142 132 128 L132 138 Q96 152 60 138 Z"/>
+  <circle cx="96" cy="150" r="7"/>
+  <!-- paws -->
+  <ellipse cx="72" cy="186" rx="16" ry="9"/>
+  <ellipse cx="120" cy="186" rx="16" ry="9"/>
+  <!-- head -->
+  <ellipse cx="96" cy="78" rx="52" ry="48"/>
+  <!-- eye patch -->
+  <ellipse cx="122" cy="70" rx="18" ry="16"/>
+  <!-- floppy ears -->
+  <path d="M50 50 Q22 50 22 90 Q24 120 44 114 Q56 90 56 60 Z"/>
+  <path d="M142 50 Q170 50 170 90 Q168 120 148 114 Q136 90 136 60 Z"/>
+  <!-- muzzle -->
+  <ellipse cx="96" cy="100" rx="24" ry="18"/>
+  <!-- eyes -->
+  <ellipse class="k" cx="74" cy="72" rx="8" ry="10"/>
+  <ellipse class="k" cx="120" cy="72" rx="8" ry="10"/>
+  <circle class="w" cx="71" cy="68" r="3"/>
+  <circle class="w" cx="117" cy="68" r="3"/>
+  <!-- nose & mouth -->
+  <ellipse class="k" cx="96" cy="92" rx="9" ry="6"/>
+  <path class="n" d="M96 98 L96 104 M96 104 Q90 110 84 106 M96 104 Q102 110 108 106"/>
+  <!-- tongue -->
+  <path d="M90 108 Q96 104 102 108 Q102 122 96 122 Q90 122 90 108 Z"/>
+</svg>
