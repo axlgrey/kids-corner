@@ -10,6 +10,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Color Fun!: <https://axlgrey.github.io/kids-corner/k-color/src/>
 - Draw Fun!: <https://axlgrey.github.io/kids-corner/k-draw/src/>
 - Drum Fun!: <https://axlgrey.github.io/kids-corner/k-drum/src/>
+- Find It!: <https://axlgrey.github.io/kids-corner/k-find/src/>
 - Match It!: <https://axlgrey.github.io/kids-corner/k-match/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 
@@ -21,6 +22,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Color Fun! | [`k-color/src/`](k-color/src/) | Pick a picture and tap areas to color them in. |
 | Draw Fun! | [`k-draw/src/`](k-draw/src/) | A drawing book: pick a blank page or a picture to trace, and draw freehand. |
 | Drum Fun! | [`k-drum/src/`](k-drum/src/) | Tap colorful pads, play drums and percussion, and learn simple rhythms. |
+| Find It! | [`k-find/src/`](k-find/src/) | A 3D room game: look around and find the toys and treats that are asked for. |
 | Match It! | [`k-match/src/`](k-match/src/) | An activity book: match words, numbers, letters, colors, shadows and body parts to pictures. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 
@@ -116,6 +118,29 @@ the SVG as `k-draw/src/pictures/<category id>/<picture id>.svg`, add it to
 2. Write each hit as `PAD:BEATS`, where `PAD` is a pad id from that kit
    (beats default to 1). Use `-` for a rest.
 3. Bump `VERSION` in `k-drum/src/sw.js`.
+
+## Find It!
+
+- A cosy 3D room: move the phone or tablet around (gyro) or drag to look,
+  then tap the item that is asked for. Pinch or mouse wheel to zoom.
+- 15 things to find, such as a teddy bear, candy, cake, rubber duck, toy car
+  and ice cream.
+- Three modes: Easy (3 big items, hint after 12 s), Normal (5 items, 3
+  decoys, hint after 20 s) and Hard (7 small items, 5 decoys, hidden spots
+  under the bed or behind the sofa). The best time per mode is saved.
+- Each found item has its own sound, a funny word and confetti. Everything
+  in the room reacts when tapped: the bed bounces, the door creaks, birds
+  fly from the window and a cat wanders around.
+- Hint arrow, task read aloud, and sound and gyro toggles.
+- All 3D models are built from three.js shapes and all sounds are generated
+  in the browser; the only asset is three.js itself (r170, MIT) in
+  `k-find/src/vendor/`.
+- The gyro needs HTTPS (or localhost) and, on iPhone/iPad, permission,
+  which is asked when a mode is picked.
+- Works fully offline, with the same update banner as Color Fun!.
+
+Items live in `k-find/src/items.js` and the room in `k-find/src/room.js`;
+bump `VERSION` in `k-find/src/sw.js` after changing them.
 
 ## Match It!
 

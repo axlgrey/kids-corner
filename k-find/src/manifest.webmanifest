@@ -1,0 +1,16 @@
+{
+  "name": "Find It!",
+  "short_name": "Find It",
+  "description": "A kid-friendly 3D room game: look around and find the toys and treats.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff8e7",
+  "theme_color": "#ff8fab",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
