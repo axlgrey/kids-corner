@@ -243,7 +243,7 @@ soundBtn.onclick = () => {
 // ---- Camera + face tracking ----
 const video = $("#video");
 const canvas = $("#view");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const startBox = $("#startBox");
 const startMsg = $("#startMsg");
 const faceCount = $("#faceCount");
@@ -460,6 +460,33 @@ const updateTracks = (raw, now) => {
   return tracks;
 };
 
+// Sample the cheeks from the camera picture a few times a second, so items
+// such as the grumpy mouth can be painted in the person's own skin tone.
+let lastSkinSample = 0;
+const sampleSkin = (dpr, now) => {
+  if (now - lastSkinSample < 250) return;
+  lastSkinSample = now;
+  for (const track of tracks) {
+    if (!track.live) continue;
+    const f = track.face;
+    const ax = Math.cos(f.angle);
+    const ay = Math.sin(f.angle);
+    let r = 0, g = 0, b = 0, n = 0;
+    for (const side of [-1, 1]) {
+      const x = (f.mouth.x + f.nose.x) / 2 + side * ax * f.unit * 0.7;
+      const y = (f.mouth.y + f.nose.y) / 2 + side * ay * f.unit * 0.7;
+      const size = Math.max(2, Math.round(f.unit * dpr * 0.15));
+      try {
+        const data = ctx.getImageData(Math.round(x * dpr - size / 2), Math.round(y * dpr - size / 2), size, size).data;
+        for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+      } catch {}
+    }
+    if (!n) continue;
+    const c = [r / n, g / n, b / n];
+    track.skin = track.skin ? track.skin.map((v, i) => v + (c[i] - v) * 0.4) : c;
+  }
+};
+
 const ANCHOR_SHIFT = { top: -0.25, lip: 0.15, chin: -0.1 };
 
 const drawItems = (face, dpr, now, alpha = 1) => {
@@ -519,7 +546,10 @@ const loop = (now) => {
   }
   lastFaces = tracks.map((track) => track.face);
 
+  sampleSkin(dpr, now);
+
   tracks.forEach((track, i) => {
+    track.face.skin = track.skin;
     drawItems(track.face, dpr, now, track.alpha);
     // Only fire "wow" on a steady face; masks make mouth points jumpy.
     const open = track.live && now - track.born > 500 && track.face.mouthOpen > 0.75;

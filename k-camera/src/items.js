@@ -811,24 +811,36 @@
     {
       id: "frown", emoji: "☹️", name: "Grumpy Mouth", anchor: "mouth", layer: 4, sound: "sad",
       draw(ctx, f, t) {
-        const wob = Math.sin(t * 3) * 0.03;
+        // Cover the real mouth with a soft patch in the person's skin tone,
+        // then draw a frown in a darker shade of the same tone.
+        const [r, g, b] = f.skin || [214, 160, 130];
+        const tone = (k, a = 1) => `rgba(${Math.round(r * k)},${Math.round(g * k)},${Math.round(b * k)},${a})`;
+        const open = f.mouthOpen || 0;
+        const patch = ctx.createRadialGradient(0, 0, 0.2, 0, 0, 0.75);
+        patch.addColorStop(0, tone(1));
+        patch.addColorStop(0.6, tone(1, 0.95));
+        patch.addColorStop(1, tone(1, 0));
+        ctx.fillStyle = patch;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 0.75, 0.42 + open * 0.25, 0, 0, TAU);
+        ctx.fill();
+        const wob = Math.sin(t * 3) * 0.02;
         ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.moveTo(-0.5, 0.18 + wob);
-        ctx.quadraticCurveTo(0, -0.32, 0.5, 0.18 - wob);
-        ctx.lineWidth = 0.2;
-        ctx.strokeStyle = "#7f1d1d";
+        ctx.moveTo(-0.42, 0.14 + wob);
+        ctx.quadraticCurveTo(0, -0.2, 0.42, 0.14 - wob);
+        ctx.lineWidth = 0.11;
+        ctx.strokeStyle = tone(0.45, 0.85);
         ctx.stroke();
-        ctx.lineWidth = 0.12;
-        ctx.strokeStyle = "#e5383b";
+        ctx.lineWidth = 0.05;
+        ctx.strokeStyle = `rgba(${Math.round(r * 0.75 + 30)},${Math.round(g * 0.5)},${Math.round(b * 0.5)},0.6)`;
         ctx.stroke();
-        // Little grumpy creases at the corners.
-        ctx.lineWidth = 0.035;
-        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 0.03;
+        ctx.strokeStyle = tone(0.55, 0.6);
         for (const side of [-1, 1]) {
           ctx.beginPath();
-          ctx.moveTo(side * 0.58, 0.12);
-          ctx.quadraticCurveTo(side * 0.66, 0.24, side * 0.6, 0.36);
+          ctx.moveTo(side * 0.48, 0.1);
+          ctx.quadraticCurveTo(side * 0.55, 0.2, side * 0.5, 0.3);
           ctx.stroke();
         }
       }
@@ -854,9 +866,9 @@
         ctx.lineWidth = 0.03;
         ctx.strokeStyle = "#2b1a0e";
         ctx.stroke();
-        ctx.fillStyle = "#e63946";
+        ctx.fillStyle = "#7a2e2e";
         ctx.fillRect(0.2, -0.085, 0.12, 0.17);
-        ctx.fillStyle = "#ffd60a";
+        ctx.fillStyle = "#a68a4a";
         ctx.fillRect(0.235, -0.085, 0.05, 0.17);
         ctx.fillStyle = "#adb5bd";
         ctx.fillRect(1.0, -0.1, 0.08, 0.2);
