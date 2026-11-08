@@ -91,12 +91,12 @@
     {
       id: "nose", emoji: "🔴", name: "Clown Nose", anchor: "nose", layer: 4, sound: "honk",
       draw(ctx, f, t) {
-        const r = 0.3 * (1 + 0.06 * Math.sin(t * 8));
-        const g = ctx.createRadialGradient(-0.1, -0.1, 0.02, 0, 0, r);
+        const r = 0.45 * (1 + 0.06 * Math.sin(t * 8));
+        const g = ctx.createRadialGradient(-0.15, -0.15, 0.03, 0, 0, r);
         g.addColorStop(0, "#ff6b6b");
         g.addColorStop(1, "#c1121f");
-        blob(ctx, 0, 0, r, g);
-        shine(ctx, -0.1, -0.12, 0.08);
+        blob(ctx, 0, 0, r, g, "#222", 0.05);
+        shine(ctx, -0.15, -0.18, 0.12);
       }
     },
     {
