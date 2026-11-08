@@ -260,6 +260,12 @@ const loadModel = async () => {
   return landmarker;
 };
 
+// Show the camera at full quality, but run detection on a smaller copy:
+// the face models work at 128-192 px anyway, so this keeps tracking fast.
+const DETECT_WIDTH = 640;
+const detectCanvas = document.createElement("canvas");
+const detectCtx = detectCanvas.getContext("2d");
+let lastDetectScale = 1;
 let busy = false;
 const track = async () => {
   if (busy || video.currentTime === lastVideoTime) return;
@@ -267,7 +273,19 @@ const track = async () => {
   busy = true;
   lastVideoTime = video.currentTime;
   try {
-    lastResult = await landmarker.estimateFaces(video, { flipHorizontal: false });
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    const ratio = Math.min(1, DETECT_WIDTH / vw);
+    const dw = Math.round(vw * ratio);
+    const dh = Math.round(vh * ratio);
+    if (detectCanvas.width !== dw || detectCanvas.height !== dh) {
+      detectCanvas.width = dw;
+      detectCanvas.height = dh;
+    }
+    detectCtx.drawImage(video, 0, 0, dw, dh);
+    const faces = await landmarker.estimateFaces(detectCanvas, { flipHorizontal: false });
+    lastDetectScale = 1 / ratio;
+    lastResult = faces;
     resultFresh = true;
   } catch (err) {
     console.error(err);
@@ -286,7 +304,7 @@ video.addEventListener("resize", syncVideoSize);
 const startCamera = async () => {
   if (stream) stream.getTracks().forEach((track) => track.stop());
   stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: settings.facing, width: { ideal: 640 }, height: { ideal: 480 } },
+    video: { facingMode: settings.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
     audio: false
   });
   video.srcObject = stream;
@@ -467,8 +485,8 @@ const loop = (now) => {
   track();
 
   const map = (m) => {
-    const x = ox + m.x * scale;
-    return { x: mirror ? cw - x : x, y: oy + m.y * scale };
+    const x = ox + m.x * lastDetectScale * scale;
+    return { x: mirror ? cw - x : x, y: oy + m.y * lastDetectScale * scale };
   };
   if (resultFresh) {
     resultFresh = false;
