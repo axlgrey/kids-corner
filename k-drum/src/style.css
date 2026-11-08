@@ -333,6 +333,7 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: 50% / 40%;
   background: radial-gradient(ellipse at 50% 35%, #fff 0 55%, #e8e8e8 56% 64%, var(--color) 65%);
   box-shadow: 0 8px 0 #333;
+  z-index: 2;
 }
 .piece.cymbal {
   aspect-ratio: 2.6;

@@ -388,6 +388,14 @@
       { name: "🦆 Duck Parade", bpm: 100, rows: { quack: "x.x.x...x.x.x...", ding: "x.......x.......", pop: "....x.......x..." } }
     ]
   };
+  // The fresh-load pattern of each kit is offered first as "Starter".
+  Object.entries(DEFAULT_PATTERNS).forEach(([id, preset]) => {
+    const rows = {};
+    Object.entries(preset).forEach(([pad, steps8]) => {
+      rows[pad] = steps8.map((v) => (v ? "x." : "..")).join("");
+    });
+    (LOOPS[id] = LOOPS[id] || []).unshift({ name: "⭐ Starter", bpm: 100, rows });
+  });
   const loopMenu = $("#loopMenu");
   const loopList = $("#loopList");
   const loadLoop = (loop) => {

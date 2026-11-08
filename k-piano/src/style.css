@@ -245,6 +245,13 @@ button { font-family: inherit; cursor: pointer; }
   body { padding-top: 0; }
 }
 
+/* Big screens (desktop): keep the piano near the controls instead of the
+   bottom edge, and cap its width so keys don't stretch across the window. */
+@media (min-height: 640px) and (min-width: 900px) {
+  .stage { justify-content: flex-start; align-items: center; padding-top: 32px; }
+  .keyboard { width: min(100%, 1100px); flex: 0 1 420px; }
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   .toolbar { padding: 4px 12px; }
   .tool { width: 40px; height: 40px; font-size: 1.1rem; }
