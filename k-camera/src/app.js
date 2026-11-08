@@ -107,6 +107,20 @@ const SOUNDS = {
   },
   zap: (t) => tone(t, { type: "sawtooth", freq: 1800, end: 80, dur: 0.4, peak: 0.25 }),
   ho: (t) => [0, 0.28, 0.56].forEach((d) => tone(t + d, { type: "triangle", freq: 150, end: 110, dur: 0.22, peak: 0.5, vib: 8, vibRate: 6 })),
+  woof: (t) => [0, 0.3].forEach((d) => {
+    tone(t + d, { type: "sawtooth", freq: 420, end: 180, dur: 0.16, peak: 0.3 });
+    noise(t + d, { dur: 0.12, freq: 900, q: 2, peak: 0.3 });
+  }),
+  arr: (t) => tone(t, { type: "sawtooth", freq: 140, end: 95, dur: 0.7, peak: 0.25, vib: 18, vibRate: 25 }),
+  magic: (t) => [1047, 1319, 1568, 2093, 2637, 3136].forEach((f, i) => tone(t + i * 0.05, { type: "sine", freq: f, dur: 0.4, peak: 0.15 })),
+  bubble: (t) => {
+    tone(t, { freq: 200, end: 900, dur: 0.5, peak: 0.25 });
+    tone(t + 0.55, { freq: 1200, end: 300, dur: 0.08, peak: 0.6 });
+  },
+  waa: (t) => [0, 0.45].forEach((d) => tone(t + d, { type: "sawtooth", freq: 520, end: 380, dur: 0.4, peak: 0.15, vib: 30, vibRate: 9 })),
+  rainbow: (t) => tone(t, { type: "triangle", freq: 300, end: 1800, dur: 0.6, peak: 0.25, vib: 40, vibRate: 14 }),
+  choir: (t) => [523, 659, 784].forEach((f) => tone(t, { type: "sine", freq: f, dur: 1.2, peak: 0.12, vib: 5, vibRate: 5 })),
+  cool: (t) => [0, 0.12].forEach((d, i) => tone(t + d, { type: "square", freq: [392, 523][i], dur: 0.12, peak: 0.12 })),
   off: (t) => tone(t, { type: "triangle", freq: 600, end: 150, dur: 0.25, peak: 0.3 }),
   giggle: (t) => [0, 1, 2, 3, 4].forEach((i) => tone(t + i * 0.09, { type: "triangle", freq: 700 + (i % 2) * 200 - i * 40, dur: 0.08, peak: 0.25 })),
   wow: (t) => tone(t, { type: "triangle", freq: 300, end: 700, dur: 0.5, peak: 0.3, vib: 25, vibRate: 7 }),
@@ -195,7 +209,7 @@ $("#clearBtn").onclick = () => {
 $("#randomBtn").onclick = () => {
   const pick = (ids) => ids[Math.floor(Math.random() * ids.length)];
   const groups = {};
-  for (const item of ITEMS) (groups[item.anchor] ||= []).push(item.id);
+  for (const item of ITEMS) (groups[item.group || item.anchor || "parts"] ||= []).push(item.id);
   const chosen = new Set();
   for (const ids of Object.values(groups)) if (Math.random() < 0.6) chosen.add(pick(ids));
   if (!chosen.size) chosen.add(pick(ITEMS.map((i) => i.id)));
@@ -445,19 +459,22 @@ const ANCHOR_SHIFT = { top: -0.25, lip: 0.15, chin: -0.1 };
 const drawItems = (face, dpr, now, alpha = 1) => {
   const t = now / 1000;
   ctx.globalAlpha = alpha;
-  const items = settings.selected.map((id) => byId[id]).sort((a, b) => a.layer - b.layer);
-  for (const item of items) {
+  // An item is drawn whole, or as `parts` (each with its own anchor and layer).
+  const parts = settings.selected
+    .flatMap((id) => (byId[id].parts || [byId[id]]).map((part) => ({ item: byId[id], part })))
+    .sort((a, b) => a.part.layer - b.part.layer);
+  for (const { item, part } of parts) {
     const age = (now - (popAt[item.id] || 0)) / 1000;
     if (age < 0) continue;
     const k = age < 0.5 ? 1 + Math.sin(Math.min(age / 0.5, 1) * Math.PI) * 0.35 - (1 - Math.min(age / 0.15, 1)) : 1;
     if (k <= 0) continue;
-    const at = face[item.anchor];
+    const at = face[part.anchor];
     ctx.save();
     ctx.translate(at.x * dpr, at.y * dpr);
     ctx.rotate(face.angle);
     ctx.scale(face.unit * dpr * k, face.unit * dpr * k);
-    ctx.translate(0, ANCHOR_SHIFT[item.anchor] || 0);
-    item.draw(ctx, face, t);
+    ctx.translate(0, ANCHOR_SHIFT[part.anchor] || 0);
+    part.draw(ctx, face, t);
     ctx.restore();
   }
   ctx.globalAlpha = 1;
