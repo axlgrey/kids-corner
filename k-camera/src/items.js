@@ -693,14 +693,14 @@
     {
       id: "shades", emoji: "😎", name: "Cool Shades", anchor: "eyes", layer: 3, sound: "cool",
       draw(ctx, f, t) {
-        // Two separate slim lenses joined by a thin metal bridge.
+        // Two separate slim lenses, tilted up at the outer corners, joined by a thin bridge.
         const lens = (side) => {
           ctx.beginPath();
-          ctx.moveTo(side * 0.14, -0.2);
-          ctx.lineTo(side * 0.9, -0.22);
-          ctx.quadraticCurveTo(side * 0.92, 0.12, side * 0.7, 0.2);
-          ctx.quadraticCurveTo(side * 0.4, 0.26, side * 0.2, 0.12);
-          ctx.quadraticCurveTo(side * 0.12, 0.02, side * 0.14, -0.2);
+          ctx.moveTo(side * 0.14, -0.13);
+          ctx.lineTo(side * 0.9, -0.3);
+          ctx.quadraticCurveTo(side * 0.94, 0.06, side * 0.72, 0.16);
+          ctx.quadraticCurveTo(side * 0.4, 0.24, side * 0.2, 0.12);
+          ctx.quadraticCurveTo(side * 0.12, 0.04, side * 0.14, -0.13);
           ctx.closePath();
         };
         for (const side of [-1, 1]) {
@@ -710,8 +710,8 @@
           g.addColorStop(1, "#05070d");
           ctx.fillStyle = g;
           ctx.fill();
-          ctx.lineWidth = 0.035;
-          ctx.strokeStyle = "#adb5bd";
+          ctx.lineWidth = 0.05;
+          ctx.strokeStyle = "#111";
           ctx.stroke();
           ctx.save();
           lens(side);
@@ -727,13 +727,13 @@
           ctx.restore();
         }
         ctx.lineCap = "round";
-        ctx.lineWidth = 0.035;
-        ctx.strokeStyle = "#adb5bd";
+        ctx.lineWidth = 0.05;
+        ctx.strokeStyle = "#111";
         ctx.beginPath();
-        ctx.moveTo(-0.14, -0.15);
-        ctx.quadraticCurveTo(0, -0.22, 0.14, -0.15);
-        ctx.moveTo(-0.9, -0.2); ctx.lineTo(-1.12, -0.24);
-        ctx.moveTo(0.9, -0.2); ctx.lineTo(1.12, -0.24);
+        ctx.moveTo(-0.14, -0.1);
+        ctx.quadraticCurveTo(0, -0.16, 0.14, -0.1);
+        ctx.moveTo(-0.9, -0.28); ctx.lineTo(-1.12, -0.32);
+        ctx.moveTo(0.9, -0.28); ctx.lineTo(1.12, -0.32);
         ctx.stroke();
       }
     },
@@ -792,10 +792,10 @@
         ctx.moveTo(x - 0.28, 0.32);
         ctx.quadraticCurveTo(x, 0.48, x + 0.28, 0.34);
         ctx.lineWidth = 0.09;
-        ctx.strokeStyle = "rgba(150,40,40,0.35)";
+        ctx.strokeStyle = "rgba(0,0,0,0.25)";
         ctx.stroke();
         ctx.lineWidth = 0.04;
-        ctx.strokeStyle = "#7f1d1d";
+        ctx.strokeStyle = "#111";
         ctx.stroke();
         ctx.lineWidth = 0.025;
         for (let i = 0; i < 3; i++) {
