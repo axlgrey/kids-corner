@@ -232,7 +232,7 @@ let stream = null;
 let lastFaces = [];
 let lastVideoTime = -1;
 let lastResult = null;
-const mouthWasOpen = [];
+let resultFresh = false;
 
 // TensorFlow.js face mesh (tfjs runtime), all files served locally.
 const loadModel = async () => {
@@ -268,6 +268,7 @@ const track = async () => {
   lastVideoTime = video.currentTime;
   try {
     lastResult = await landmarker.estimateFaces(video, { flipHorizontal: false });
+    resultFresh = true;
   } catch (err) {
     console.error(err);
   }
@@ -369,34 +370,63 @@ const faceInfo = (marks, map) => {
   };
 };
 
-// Glide items between detections so they follow the face smoothly.
+// Faces are kept as tracks so items do not blink when detection drops out
+// for a moment (masks, hands, fast turns): a lost face holds its place for
+// HOLD_MS, then fades out over FADE_MS. New faces fade in.
 const SMOOTH_KEYS = ["eyes", "nose", "lip", "mouth", "chin", "top"];
-const smoothFaces = (raw) => {
-  const prev = lastFaces;
-  return raw.map((face) => {
+const HOLD_MS = 700;
+const FADE_MS = 400;
+const FADE_IN_MS = 200;
+let tracks = [];
+let nextTrackId = 1;
+
+const blendFace = (old, face) => {
+  const d = dist(old.eyes, face.eyes);
+  const k = Math.min(1, 0.45 + d / face.unit);
+  const mix = (a, b) => a + (b - a) * k;
+  const out = { ...face };
+  for (const key of SMOOTH_KEYS) out[key] = { x: mix(old[key].x, face[key].x), y: mix(old[key].y, face[key].y) };
+  out.unit = mix(old.unit, face.unit);
+  let da = face.angle - old.angle;
+  da = Math.atan2(Math.sin(da), Math.cos(da));
+  out.angle = old.angle + da * k;
+  return out;
+};
+
+const updateTracks = (raw, now) => {
+  const free = new Set(tracks);
+  for (const face of raw) {
     let best = null;
     let bestDist = Infinity;
-    for (const old of prev) {
-      const d = dist(old.eyes, face.eyes);
-      if (d < bestDist) { best = old; bestDist = d; }
+    for (const track of free) {
+      const d = dist(track.face.eyes, face.eyes);
+      if (d < bestDist) { best = track; bestDist = d; }
     }
-    if (!best || bestDist > face.unit * 1.5) return face;
-    const k = Math.min(1, 0.45 + bestDist / face.unit);
-    const mix = (a, b) => a + (b - a) * k;
-    const out = { ...face };
-    for (const key of SMOOTH_KEYS) out[key] = { x: mix(best[key].x, face[key].x), y: mix(best[key].y, face[key].y) };
-    out.unit = mix(best.unit, face.unit);
-    let da = face.angle - best.angle;
-    da = Math.atan2(Math.sin(da), Math.cos(da));
-    out.angle = best.angle + da * k;
-    return out;
-  });
+    if (best && bestDist < Math.max(face.unit, best.face.unit) * 2) {
+      free.delete(best);
+      best.face = blendFace(best.face, face);
+      best.seen = now;
+    } else {
+      tracks.push({ id: nextTrackId++, face, seen: now, born: now, mouthOpen: false });
+    }
+  }
+  tracks = tracks.filter((track) => now - track.seen < HOLD_MS + FADE_MS);
+  for (const track of tracks) {
+    const fadeIn = Math.min(1, (now - track.born) / FADE_IN_MS);
+    const lost = now - track.seen - HOLD_MS;
+    const fadeOut = lost > 0 ? 1 - lost / FADE_MS : 1;
+    track.alpha = Math.max(0, Math.min(fadeIn, fadeOut));
+    track.live = track.seen === now || now - track.seen < 150;
+  }
+  tracks.sort((a, b) => a.face.eyes.x - b.face.eyes.x);
+  return tracks;
 };
 
 const ANCHOR_SHIFT = { top: -0.25, lip: 0.15, chin: -0.1 };
 
-const drawItems = (face, dpr, now) => {
+const drawItems = (face, dpr, now, alpha = 1) => {
   const t = now / 1000;
+  ctx.globalAlpha = alpha;
   const items = settings.selected.map((id) => byId[id]).sort((a, b) => a.layer - b.layer);
   for (const item of items) {
     const age = (now - (popAt[item.id] || 0)) / 1000;
@@ -412,6 +442,7 @@ const drawItems = (face, dpr, now) => {
     item.draw(ctx, face, t);
     ctx.restore();
   }
+  ctx.globalAlpha = 1;
 };
 
 const loop = (now) => {
@@ -439,20 +470,24 @@ const loop = (now) => {
     const x = ox + m.x * scale;
     return { x: mirror ? cw - x : x, y: oy + m.y * scale };
   };
-  const raw = (lastResult || []).map((face) => faceInfo(face.keypoints, map));
-  raw.sort((a, b) => a.eyes.x - b.eyes.x);
-  lastFaces = smoothFaces(raw);
+  if (resultFresh) {
+    resultFresh = false;
+    updateTracks((lastResult || []).map((face) => faceInfo(face.keypoints, map)), now);
+  } else {
+    updateTracks([], now);
+  }
+  lastFaces = tracks.map((track) => track.face);
 
-  lastFaces.forEach((face, i) => {
-    drawItems(face, dpr, now);
-    const open = face.mouthOpen > 0.75;
-    if (open && !mouthWasOpen[i]) {
+  tracks.forEach((track, i) => {
+    drawItems(track.face, dpr, now, track.alpha);
+    // Only fire "wow" on a steady face; masks make mouth points jumpy.
+    const open = track.live && now - track.born > 500 && track.face.mouthOpen > 0.75;
+    if (open && !track.mouthOpen) {
       play("wow");
-      burst(["🎉", "⭐", "💥", "🌈"][i % 4], face.mouth.x, face.mouth.y, 5);
+      burst(["🎉", "⭐", "💥", "🌈"][i % 4], track.face.mouth.x, track.face.mouth.y, 5);
     }
-    mouthWasOpen[i] = open;
+    track.mouthOpen = open;
   });
-  mouthWasOpen.length = lastFaces.length;
 
   const n = lastFaces.length;
   faceCount.hidden = false;
