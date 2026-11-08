@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#8338ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Silly Faces">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Silly Faces!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <h1 class="title">🤡 Silly Faces!</h1>
+    <div class="tools">
+      <button id="randomBtn" class="tool" aria-label="Surprise me">🎲</button>
+      <button id="clearBtn" class="tool" aria-label="Remove all">🧽</button>
+      <button id="soundBtn" class="tool on" aria-label="Sound">🔊</button>
+      <button id="flipBtn" class="tool" aria-label="Switch camera">🔄</button>
+      <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <canvas id="view" class="view"></canvas>
+    <video id="video" playsinline muted autoplay></video>
+    <div id="fx" class="fx"></div>
+    <div id="faceCount" class="face-count" hidden></div>
+    <button id="snapBtn" class="snap-btn" aria-label="Take photo">📸</button>
+    <div id="flash" class="flash"></div>
+    <div id="startBox" class="start-box">
+      <div class="start-card">
+        <div class="start-emoji">🤡👓🐽</div>
+        <p id="startMsg">Let's make silly faces!</p>
+        <button id="startBtn" class="big-btn">📷 Start camera</button>
+      </div>
+    </div>
+  </main>
+
+  <nav id="items" class="items" aria-label="Silly things"></nav>
+
+  <div id="photoBox" class="celebrate" hidden>
+    <div class="celebrate-box">
+      <img id="photoImg" class="photo" alt="Your silly photo">
+      <a id="saveBtn" class="big-btn" download="silly-face.png">💾 Save</a>
+      <button id="photoClose" class="big-btn alt">Back</button>
+    </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner" role="status" hidden>
+    <span>✨ A new version is ready!</span>
+    <button id="updateBtn" class="update-btn">Refresh</button>
+    <button id="updateLater" class="update-close" aria-label="Later">✕</button>
+  </div>
+
+  <script src="vendor/tfjs/tf.min.js"></script>
+  <script src="vendor/tfjs/face-landmarks-detection.min.js"></script>
+  <script src="items.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

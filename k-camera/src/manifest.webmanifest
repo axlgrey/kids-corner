@@ -1,0 +1,16 @@
+{
+  "name": "Silly Faces!",
+  "short_name": "Silly Faces",
+  "description": "A kid-friendly camera app. Put glasses, clown noses, sleepy eyes and more on every face, with funny sounds.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff3c4",
+  "theme_color": "#8338ec",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
