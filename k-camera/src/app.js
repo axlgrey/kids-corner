@@ -238,12 +238,17 @@ const mouthWasOpen = [];
 const loadModel = async () => {
   if (landmarker) return landmarker;
   const tf = window.tf;
-  try {
-    await tf.setBackend("webgl");
-  } catch {
-    await tf.setBackend("cpu");
+  let ok = false;
+  for (const name of ["webgpu", "webgl", "cpu"]) {
+    if (!tf.findBackendFactory(name)) continue;
+    try {
+      ok = await tf.setBackend(name);
+      if (ok) await tf.ready();
+    } catch {
+      ok = false;
+    }
+    if (ok) break;
   }
-  await tf.ready();
   const fld = window.faceLandmarksDetection;
   landmarker = await fld.createDetector(fld.SupportedModels.MediaPipeFaceMesh, {
     runtime: "tfjs",
@@ -280,7 +285,7 @@ video.addEventListener("resize", syncVideoSize);
 const startCamera = async () => {
   if (stream) stream.getTracks().forEach((track) => track.stop());
   stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: settings.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+    video: { facingMode: settings.facing, width: { ideal: 640 }, height: { ideal: 480 } },
     audio: false
   });
   video.srcObject = stream;
@@ -364,6 +369,30 @@ const faceInfo = (marks, map) => {
   };
 };
 
+// Glide items between detections so they follow the face smoothly.
+const SMOOTH_KEYS = ["eyes", "nose", "lip", "mouth", "chin", "top"];
+const smoothFaces = (raw) => {
+  const prev = lastFaces;
+  return raw.map((face) => {
+    let best = null;
+    let bestDist = Infinity;
+    for (const old of prev) {
+      const d = dist(old.eyes, face.eyes);
+      if (d < bestDist) { best = old; bestDist = d; }
+    }
+    if (!best || bestDist > face.unit * 1.5) return face;
+    const k = Math.min(1, 0.45 + bestDist / face.unit);
+    const mix = (a, b) => a + (b - a) * k;
+    const out = { ...face };
+    for (const key of SMOOTH_KEYS) out[key] = { x: mix(best[key].x, face[key].x), y: mix(best[key].y, face[key].y) };
+    out.unit = mix(best.unit, face.unit);
+    let da = face.angle - best.angle;
+    da = Math.atan2(Math.sin(da), Math.cos(da));
+    out.angle = best.angle + da * k;
+    return out;
+  });
+};
+
 const ANCHOR_SHIFT = { top: -0.25, lip: 0.15, chin: -0.1 };
 
 const drawItems = (face, dpr, now) => {
@@ -410,8 +439,9 @@ const loop = (now) => {
     const x = ox + m.x * scale;
     return { x: mirror ? cw - x : x, y: oy + m.y * scale };
   };
-  lastFaces = (lastResult || []).map((face) => faceInfo(face.keypoints, map));
-  lastFaces.sort((a, b) => a.eyes.x - b.eyes.x);
+  const raw = (lastResult || []).map((face) => faceInfo(face.keypoints, map));
+  raw.sort((a, b) => a.eyes.x - b.eyes.x);
+  lastFaces = smoothFaces(raw);
 
   lastFaces.forEach((face, i) => {
     drawItems(face, dpr, now);
