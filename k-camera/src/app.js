@@ -125,6 +125,8 @@ const SOUNDS = {
     noise(t, { dur: 0.18, freq: 2000, end: 6000, q: 2, peak: 0.4 });
     tone(t + 0.15, { type: "square", freq: 220, end: 330, dur: 0.15, peak: 0.12 });
   },
+  sad: (t) => [392, 370, 349, 330].forEach((f, i) => tone(t + i * 0.35, { type: "sawtooth", freq: f, end: i === 3 ? 300 : undefined, dur: i === 3 ? 0.9 : 0.3, peak: 0.15, vib: i === 3 ? 12 : 0, vibRate: 6 })),
+  puff: (t) => [0, 0.35, 0.7].forEach((d) => noise(t + d, { dur: 0.25, freq: 600, end: 300, q: 1, type: "lowpass", peak: 0.35 })),
   off: (t) => tone(t, { type: "triangle", freq: 600, end: 150, dur: 0.25, peak: 0.3 }),
   giggle: (t) => [0, 1, 2, 3, 4].forEach((i) => tone(t + i * 0.09, { type: "triangle", freq: 700 + (i % 2) * 200 - i * 40, dur: 0.08, peak: 0.25 })),
   wow: (t) => tone(t, { type: "triangle", freq: 300, end: 700, dur: 0.5, peak: 0.3, vib: 25, vibRate: 7 }),

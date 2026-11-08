@@ -807,6 +807,71 @@
           ctx.stroke();
         }
       }
+    },
+    {
+      id: "frown", emoji: "☹️", name: "Grumpy Mouth", anchor: "mouth", layer: 4, sound: "sad",
+      draw(ctx, f, t) {
+        const wob = Math.sin(t * 3) * 0.03;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-0.5, 0.18 + wob);
+        ctx.quadraticCurveTo(0, -0.32, 0.5, 0.18 - wob);
+        ctx.lineWidth = 0.2;
+        ctx.strokeStyle = "#7f1d1d";
+        ctx.stroke();
+        ctx.lineWidth = 0.12;
+        ctx.strokeStyle = "#e5383b";
+        ctx.stroke();
+        // Little grumpy creases at the corners.
+        ctx.lineWidth = 0.035;
+        ctx.strokeStyle = "#222";
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(side * 0.58, 0.12);
+          ctx.quadraticCurveTo(side * 0.66, 0.24, side * 0.6, 0.36);
+          ctx.stroke();
+        }
+      }
+    },
+    {
+      id: "cigar", emoji: "🚬", name: "Cigar", anchor: "mouth", layer: 5, sound: "puff",
+      draw(ctx, f, t) {
+        ctx.save();
+        ctx.translate(0.15, 0);
+        ctx.rotate(0.25 + Math.sin(t * 2) * 0.05);
+        const g = ctx.createLinearGradient(0, -0.1, 0, 0.1);
+        g.addColorStop(0, "#a0522d");
+        g.addColorStop(0.5, "#6f4518");
+        g.addColorStop(1, "#432818");
+        ctx.beginPath();
+        ctx.moveTo(0, -0.08);
+        ctx.lineTo(1.0, -0.1);
+        ctx.lineTo(1.0, 0.1);
+        ctx.lineTo(0, 0.08);
+        ctx.quadraticCurveTo(-0.06, 0, 0, -0.08);
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.lineWidth = 0.03;
+        ctx.strokeStyle = "#2b1a0e";
+        ctx.stroke();
+        ctx.fillStyle = "#e63946";
+        ctx.fillRect(0.2, -0.085, 0.12, 0.17);
+        ctx.fillStyle = "#ffd60a";
+        ctx.fillRect(0.235, -0.085, 0.05, 0.17);
+        ctx.fillStyle = "#adb5bd";
+        ctx.fillRect(1.0, -0.1, 0.08, 0.2);
+        const glow = 0.6 + 0.4 * Math.sin(t * 4);
+        blob(ctx, 1.1, 0, 0.09, `rgba(255,${80 + glow * 80},0,${0.6 + glow * 0.4})`, null);
+        ctx.restore();
+        // Smoke puffs drifting up from the tip.
+        for (let i = 0; i < 4; i++) {
+          const p = (t * 0.5 + i / 4) % 1;
+          ctx.save();
+          ctx.globalAlpha *= 0.5 * (1 - p);
+          blob(ctx, 1.2 + Math.sin(p * 6 + i) * 0.15 + p * 0.3, 0.2 - p * 1.6, 0.1 + p * 0.25, "#dee2e6", null);
+          ctx.restore();
+        }
+      }
     }
   ];
 })();
