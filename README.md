@@ -13,6 +13,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Find It!: <https://axlgrey.github.io/kids-corner/k-find/src/>
 - Match It!: <https://axlgrey.github.io/kids-corner/k-match/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
+- Silly Faces!: <https://axlgrey.github.io/kids-corner/k-camera/src/>
 
 ## Apps
 
@@ -25,6 +26,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Find It! | [`k-find/src/`](k-find/src/) | A 3D room game: look around and find the toys and treats that are asked for. |
 | Match It! | [`k-match/src/`](k-match/src/) | An activity book: match words, numbers, letters, colors, shadows and body parts to pictures. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
+| Silly Faces! | [`k-camera/src/`](k-camera/src/) | A camera that puts glasses, clown noses, sleepy eyes and more on every face. |
 
 ## Balloon Pop!
 
@@ -175,6 +177,31 @@ Categories and stickers live in `k-match/src/data.js`; bump `VERSION` in
 2. Write each note as `NAME:BEATS` (beats default to 1, so `G4:2` is twice
    as long). Sharps use `#`, e.g. `A#4`. Notes must be between C4 and C6.
 3. Bump `VERSION` in `k-piano/src/sw.js`.
+
+## Silly Faces!
+
+- Live face tracking of up to 4 faces; the chosen items go on every face and
+  follow head tilt and size.
+- 16 items, pick as many as you like: glasses, clown nose, sleepy eyes (with
+  floating Zzz), googly eyes, heart eyes, star eyes, mustache, silly tongue,
+  piggy nose, kitty whiskers, rosy cheeks, party hat, crown, bunny ears,
+  alien antennae and a big beard.
+- Each item pops in with its own sound (boing, honk, snore, oink, meow and
+  more) generated in the browser, plus an emoji burst.
+- Open your mouth wide for a "wow" and confetti; tap a face to make it
+  giggle.
+- Random silly look, remove all, sound on/off, front/back camera switch, and
+  take and save a photo.
+- Face tracking runs entirely on the device with TensorFlow.js and
+  face-landmarks-detection (Apache-2.0), vendored with their models in
+  `k-camera/src/vendor/tfjs/`. No video or usage data leaves the device.
+- The camera needs HTTPS (or localhost) and permission from the browser.
+- Works fully offline, with the same update banner as Color Fun!.
+
+Items live in `k-camera/src/items.js`: each has an `anchor` (`eyes`,
+`nose`, `lip`, `mouth`, `chin`, `top`), a `layer`, a `sound` from `SOUNDS`
+in `k-camera/src/app.js` and a `draw(ctx, face, t)` function, measured in
+eye distances. Bump `VERSION` in `k-camera/src/sw.js` after changing them.
 
 ## Adding a New App
 
