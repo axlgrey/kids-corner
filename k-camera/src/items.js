@@ -809,38 +809,72 @@
       }
     },
     {
-      id: "frown", emoji: "☹️", name: "Grumpy Mouth", anchor: "mouth", layer: 4, sound: "sad",
+      id: "monkey", emoji: "🐵", name: "Grumpy Monkey", anchor: "mouth", layer: 4, sound: "monkey",
       draw(ctx, f, t) {
-        // Cover the real mouth with a soft patch in the person's skin tone,
-        // then draw a frown in a darker shade of the same tone.
-        const [r, g, b] = f.skin || [214, 160, 130];
-        const tone = (k, a = 1) => `rgba(${Math.round(r * k)},${Math.round(g * k)},${Math.round(b * k)},${a})`;
+        // A tan monkey muzzle over the mouth and nose, tinted toward the
+        // person's skin tone so it blends in, with a grumpy frown.
+        const [sr, sg, sb] = f.skin || [214, 160, 130];
+        const mixc = (c, k) => [0, 1, 2].map((i) => Math.round(c[i] * (1 - k) + [sr, sg, sb][i] * k));
+        const rgba = (c, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+        const tan = mixc([222, 184, 135], 0.35);
+        const dark = mixc([92, 58, 33], 0.2);
+        const n = local(f, f.mouth, f.nose);
         const open = f.mouthOpen || 0;
-        const patch = ctx.createRadialGradient(0, 0, 0.2, 0, 0, 0.75);
-        patch.addColorStop(0, tone(1));
-        patch.addColorStop(0.6, tone(1, 0.95));
-        patch.addColorStop(1, tone(1, 0));
-        ctx.fillStyle = patch;
+        const top = n.y - 0.25;
+        const bottom = 0.45 + open * 0.2;
+        const cy = (top + bottom) / 2;
+        const ry = (bottom - top) / 2;
+        // Soft edge so the muzzle melts into the face.
+        const edge = ctx.createRadialGradient(0, cy, ry * 0.7, 0, cy, ry * 1.25);
+        edge.addColorStop(0, rgba(tan, 0.6));
+        edge.addColorStop(1, rgba(tan, 0));
+        ctx.fillStyle = edge;
         ctx.beginPath();
-        ctx.ellipse(0, 0, 0.75, 0.42 + open * 0.25, 0, 0, TAU);
+        ctx.ellipse(0, cy, 0.95 * 1.2, ry * 1.25, 0, 0, TAU);
         ctx.fill();
-        const wob = Math.sin(t * 3) * 0.02;
-        ctx.lineCap = "round";
+        // Muzzle: two puffy cheeks plus a rounded chin.
+        const fill = ctx.createRadialGradient(-0.15, cy - ry * 0.4, 0.05, 0, cy, ry * 1.1);
+        fill.addColorStop(0, rgba(mixc([240, 210, 170], 0.3)));
+        fill.addColorStop(1, rgba(tan));
+        ctx.fillStyle = fill;
         ctx.beginPath();
-        ctx.moveTo(-0.42, 0.14 + wob);
-        ctx.quadraticCurveTo(0, -0.2, 0.42, 0.14 - wob);
-        ctx.lineWidth = 0.11;
-        ctx.strokeStyle = tone(0.45, 0.85);
-        ctx.stroke();
-        ctx.lineWidth = 0.05;
-        ctx.strokeStyle = `rgba(${Math.round(r * 0.75 + 30)},${Math.round(g * 0.5)},${Math.round(b * 0.5)},0.6)`;
-        ctx.stroke();
-        ctx.lineWidth = 0.03;
-        ctx.strokeStyle = tone(0.55, 0.6);
+        ctx.ellipse(-0.32, cy - ry * 0.15, 0.55, ry * 0.85, 0, 0, TAU);
+        ctx.ellipse(0.32, cy - ry * 0.15, 0.55, ry * 0.85, 0, 0, TAU);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(0, cy + ry * 0.25, 0.6, ry * 0.75, 0, 0, TAU);
+        ctx.fill();
+        // Nose: wide flat monkey nose with two big nostrils.
+        ctx.fillStyle = rgba(dark, 0.35);
+        ctx.beginPath();
+        ctx.ellipse(n.x, n.y + 0.02, 0.3, 0.14, 0, 0, TAU);
+        ctx.fill();
         for (const side of [-1, 1]) {
           ctx.beginPath();
-          ctx.moveTo(side * 0.48, 0.1);
-          ctx.quadraticCurveTo(side * 0.55, 0.2, side * 0.5, 0.3);
+          ctx.ellipse(n.x + side * 0.11, n.y + 0.04, 0.07, 0.05, side * 0.4, 0, TAU);
+          ctx.fillStyle = rgba(dark, 0.9);
+          ctx.fill();
+        }
+        // Grumpy frown with a twitch, and a cranky upper lip line.
+        const mouthY = 0.12 + open * 0.15;
+        const twitch = Math.sin(t * 4) * 0.025;
+        ctx.lineCap = "round";
+        ctx.lineWidth = 0.06;
+        ctx.strokeStyle = rgba(dark, 0.9);
+        ctx.beginPath();
+        ctx.moveTo(-0.42, mouthY + 0.12 + twitch);
+        ctx.quadraticCurveTo(0, mouthY - 0.12, 0.42, mouthY + 0.12 - twitch);
+        ctx.stroke();
+        ctx.lineWidth = 0.035;
+        ctx.strokeStyle = rgba(dark, 0.6);
+        ctx.beginPath();
+        ctx.moveTo(n.x, n.y + 0.12);
+        ctx.lineTo(0, mouthY - 0.07);
+        ctx.stroke();
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(side * 0.46, mouthY + 0.08);
+          ctx.quadraticCurveTo(side * 0.53, mouthY + 0.2, side * 0.47, mouthY + 0.3);
           ctx.stroke();
         }
       }
