@@ -322,14 +322,17 @@
         {
           anchor: "top", layer: 0,
           draw(ctx, f, t) {
-            ctx.lineWidth = 0.06;
-            ctx.strokeStyle = "#2b9348";
+            ctx.lineCap = "round";
             for (const side of [-1, 1]) {
               const tipX = side * (0.7 + 0.1 * Math.sin(t * 5 + side));
-              ctx.beginPath();
-              ctx.moveTo(side * 0.3, 0.05);
-              ctx.quadraticCurveTo(side * 0.3, -0.7, tipX, -1.1);
-              ctx.stroke();
+              for (const [w, c] of [[0.13, "#222"], [0.08, "#80ed99"]]) {
+                ctx.lineWidth = w;
+                ctx.strokeStyle = c;
+                ctx.beginPath();
+                ctx.moveTo(side * 0.3, 0.05);
+                ctx.quadraticCurveTo(side * 0.3, -0.7, tipX, -1.1);
+                ctx.stroke();
+              }
               const glow = ctx.createRadialGradient(tipX, -1.1, 0, tipX, -1.1, 0.35);
               glow.addColorStop(0, "rgba(128,237,153,0.8)");
               glow.addColorStop(1, "rgba(128,237,153,0)");
@@ -350,7 +353,7 @@
             for (const side of [-1, 1]) {
               ctx.save();
               ctx.translate(side * 0.52, 0);
-              ctx.rotate(side * 0.45);
+              ctx.rotate(-side * 0.45);
               ctx.scale(1, blink);
               ctx.beginPath();
               ctx.ellipse(0, 0, 0.42, 0.24, 0, 0, TAU);
@@ -525,7 +528,7 @@
       ]
     },
     {
-      id: "pirate", emoji: "🏴‍☠️", name: "Pirate Patch", anchor: "eyes", layer: 3, sound: "arr",
+      id: "pirate", emoji: "🦜", name: "Pirate Patch", anchor: "eyes", layer: 3, sound: "arr",
       draw(ctx) {
         ctx.lineWidth = 0.06;
         ctx.strokeStyle = "#111";
@@ -690,38 +693,119 @@
     {
       id: "shades", emoji: "😎", name: "Cool Shades", anchor: "eyes", layer: 3, sound: "cool",
       draw(ctx, f, t) {
+        // Two separate slim lenses joined by a thin metal bridge.
+        const lens = (side) => {
+          ctx.beginPath();
+          ctx.moveTo(side * 0.14, -0.2);
+          ctx.lineTo(side * 0.9, -0.22);
+          ctx.quadraticCurveTo(side * 0.92, 0.12, side * 0.7, 0.2);
+          ctx.quadraticCurveTo(side * 0.4, 0.26, side * 0.2, 0.12);
+          ctx.quadraticCurveTo(side * 0.12, 0.02, side * 0.14, -0.2);
+          ctx.closePath();
+        };
+        for (const side of [-1, 1]) {
+          lens(side);
+          const g = ctx.createLinearGradient(0, -0.22, 0, 0.25);
+          g.addColorStop(0, "#1d2d50");
+          g.addColorStop(1, "#05070d");
+          ctx.fillStyle = g;
+          ctx.fill();
+          ctx.lineWidth = 0.035;
+          ctx.strokeStyle = "#adb5bd";
+          ctx.stroke();
+          ctx.save();
+          lens(side);
+          ctx.clip();
+          const sweep = ((t * 0.7) % 1.6) * 2.6 - 1.6;
+          ctx.fillStyle = "rgba(255,255,255,0.35)";
+          ctx.beginPath();
+          ctx.moveTo(sweep, -0.3);
+          ctx.lineTo(sweep + 0.15, -0.3);
+          ctx.lineTo(sweep - 0.1, 0.3);
+          ctx.lineTo(sweep - 0.25, 0.3);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.lineCap = "round";
+        ctx.lineWidth = 0.035;
+        ctx.strokeStyle = "#adb5bd";
         ctx.beginPath();
-        ctx.moveTo(-0.95, -0.25);
-        ctx.lineTo(0.95, -0.25);
-        ctx.lineTo(0.9, 0.05);
-        ctx.quadraticCurveTo(0.6, 0.35, 0.25, 0.1);
-        ctx.lineTo(0.12, -0.05);
-        ctx.lineTo(-0.12, -0.05);
-        ctx.lineTo(-0.25, 0.1);
-        ctx.quadraticCurveTo(-0.6, 0.35, -0.9, 0.05);
+        ctx.moveTo(-0.14, -0.15);
+        ctx.quadraticCurveTo(0, -0.22, 0.14, -0.15);
+        ctx.moveTo(-0.9, -0.2); ctx.lineTo(-1.12, -0.24);
+        ctx.moveTo(0.9, -0.2); ctx.lineTo(1.12, -0.24);
+        ctx.stroke();
+      }
+    },
+    {
+      id: "piratehat", emoji: "🏴‍☠️", name: "Pirate Hat", anchor: "top", layer: 5, sound: "arr",
+      draw(ctx, f, t) {
+        ctx.save();
+        ctx.rotate(Math.sin(t * 2) * 0.05);
+        // Tricorn: wide brim curling up at both ends, rounded crown.
+        ctx.beginPath();
+        ctx.moveTo(-1.35, -0.55);
+        ctx.quadraticCurveTo(-1.0, 0.1, 0, 0.05);
+        ctx.quadraticCurveTo(1.0, 0.1, 1.35, -0.55);
+        ctx.quadraticCurveTo(1.0, -0.4, 0.75, -0.6);
+        ctx.quadraticCurveTo(0.7, -1.35, 0, -1.4);
+        ctx.quadraticCurveTo(-0.7, -1.35, -0.75, -0.6);
+        ctx.quadraticCurveTo(-1.0, -0.4, -1.35, -0.55);
         ctx.closePath();
-        const g = ctx.createLinearGradient(0, -0.25, 0, 0.3);
-        g.addColorStop(0, "#14213d");
-        g.addColorStop(1, "#000");
+        const g = ctx.createLinearGradient(0, -1.4, 0, 0.1);
+        g.addColorStop(0, "#2b2d42");
+        g.addColorStop(1, "#0b0c10");
         ctx.fillStyle = g;
         ctx.fill();
-        ctx.save();
-        ctx.clip();
-        const sweep = ((t * 0.7) % 1.6) * 2.6 - 1.6;
-        ctx.fillStyle = "rgba(255,255,255,0.35)";
-        ctx.beginPath();
-        ctx.moveTo(sweep, -0.3);
-        ctx.lineTo(sweep + 0.18, -0.3);
-        ctx.lineTo(sweep - 0.12, 0.35);
-        ctx.lineTo(sweep - 0.3, 0.35);
-        ctx.fill();
-        ctx.restore();
         ctx.lineWidth = 0.06;
-        ctx.strokeStyle = "#111";
+        ctx.strokeStyle = "#ffd60a";
         ctx.beginPath();
-        ctx.moveTo(-0.95, -0.2); ctx.lineTo(-1.15, -0.25);
-        ctx.moveTo(0.95, -0.2); ctx.lineTo(1.15, -0.25);
+        ctx.moveTo(-1.35, -0.55);
+        ctx.quadraticCurveTo(-1.0, 0.1, 0, 0.05);
+        ctx.quadraticCurveTo(1.0, 0.1, 1.35, -0.55);
         ctx.stroke();
+        // Skull and crossbones.
+        ctx.lineWidth = 0.07;
+        ctx.strokeStyle = "#fff";
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-0.3, -0.35); ctx.lineTo(0.3, -0.85);
+        ctx.moveTo(0.3, -0.35); ctx.lineTo(-0.3, -0.85);
+        ctx.stroke();
+        for (const [x, y] of [[-0.3, -0.35], [0.3, -0.85], [0.3, -0.35], [-0.3, -0.85]]) {
+          blob(ctx, x + (x > 0 ? 0.03 : -0.03), y, 0.05, "#fff", null);
+        }
+        blob(ctx, 0, -0.68, 0.2, "#fff", null);
+        ctx.fillRect(-0.11, -0.56, 0.22, 0.12);
+        blob(ctx, -0.075, -0.68, 0.055, "#111", null);
+        blob(ctx, 0.075, -0.68, 0.055, "#111", null);
+        ctx.restore();
+      }
+    },
+    {
+      id: "scar", emoji: "🩹", name: "Pirate Scar", anchor: "eyes", layer: 3, sound: "slash",
+      draw(ctx) {
+        // Curved scar under one eye with stitches, like a famous rubber pirate.
+        const x = -0.5;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x - 0.28, 0.32);
+        ctx.quadraticCurveTo(x, 0.48, x + 0.28, 0.34);
+        ctx.lineWidth = 0.09;
+        ctx.strokeStyle = "rgba(150,40,40,0.35)";
+        ctx.stroke();
+        ctx.lineWidth = 0.04;
+        ctx.strokeStyle = "#7f1d1d";
+        ctx.stroke();
+        ctx.lineWidth = 0.025;
+        for (let i = 0; i < 3; i++) {
+          const sx = x - 0.16 + i * 0.16;
+          const sy = 0.4 + (i === 1 ? 0.03 : 0);
+          ctx.beginPath();
+          ctx.moveTo(sx - 0.02, sy - 0.07);
+          ctx.lineTo(sx + 0.02, sy + 0.07);
+          ctx.stroke();
+        }
       }
     }
   ];

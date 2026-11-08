@@ -1,6 +1,6 @@
 // Service worker: precaches the whole app so it works fully offline.
 // Bump VERSION whenever files change to force clients to refresh the cache.
-const VERSION = "v7";
+const VERSION = "v8";
 const CACHE = `sillyfaces-${VERSION}`;
 
 const APP_FILES = [

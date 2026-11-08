@@ -121,6 +121,10 @@ const SOUNDS = {
   rainbow: (t) => tone(t, { type: "triangle", freq: 300, end: 1800, dur: 0.6, peak: 0.25, vib: 40, vibRate: 14 }),
   choir: (t) => [523, 659, 784].forEach((f) => tone(t, { type: "sine", freq: f, dur: 1.2, peak: 0.12, vib: 5, vibRate: 5 })),
   cool: (t) => [0, 0.12].forEach((d, i) => tone(t + d, { type: "square", freq: [392, 523][i], dur: 0.12, peak: 0.12 })),
+  slash: (t) => {
+    noise(t, { dur: 0.18, freq: 2000, end: 6000, q: 2, peak: 0.4 });
+    tone(t + 0.15, { type: "square", freq: 220, end: 330, dur: 0.15, peak: 0.12 });
+  },
   off: (t) => tone(t, { type: "triangle", freq: 600, end: 150, dur: 0.25, peak: 0.3 }),
   giggle: (t) => [0, 1, 2, 3, 4].forEach((i) => tone(t + i * 0.09, { type: "triangle", freq: 700 + (i % 2) * 200 - i * 40, dur: 0.08, peak: 0.25 })),
   wow: (t) => tone(t, { type: "triangle", freq: 300, end: 700, dur: 0.5, peak: 0.3, vib: 25, vibRate: 7 }),
