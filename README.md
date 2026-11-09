@@ -12,6 +12,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Drum Fun!: <https://axlgrey.github.io/kids-corner/k-drum/src/>
 - Find It!: <https://axlgrey.github.io/kids-corner/k-find/src/>
 - Match It!: <https://axlgrey.github.io/kids-corner/k-match/src/>
+- Maze Mouse!: <https://axlgrey.github.io/kids-corner/k-maze/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 - Silly Faces!: <https://axlgrey.github.io/kids-corner/k-camera/src/>
 
@@ -25,6 +26,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Drum Fun! | [`k-drum/src/`](k-drum/src/) | Tap colorful pads, play drums and percussion, and learn simple rhythms. |
 | Find It! | [`k-find/src/`](k-find/src/) | A 3D room game: look around and find the toys and treats that are asked for. |
 | Match It! | [`k-match/src/`](k-match/src/) | An activity book: match words, numbers, letters, colors, shadows and body parts to pictures. |
+| Maze Mouse! | [`k-maze/src/`](k-maze/src/) | A maze game: help the mouse find the cheese, from above or through its eyes. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 | Silly Faces! | [`k-camera/src/`](k-camera/src/) | A camera that puts glasses, clown noses, sleepy eyes and more on every face. |
 
@@ -157,6 +159,27 @@ bump `VERSION` in `k-find/src/sw.js` after changing them.
 
 Categories and stickers live in `k-match/src/data.js`; bump `VERSION` in
 `k-match/src/sw.js` after changing them.
+
+## Maze Mouse!
+
+- Walk the mouse to the cheese, collecting stars on the way.
+- Three modes: Easy (small maze, everything visible, stars, balloons,
+  banana peels and frogs), Medium (medium maze, flashlight cone, the cheese
+  room is locked until the key is found) and Hard (big maze, narrow
+  flickering flashlight, more banana peels and ghosts that say BOO).
+- Two views, switchable any time with the HUD button or `V`: from above
+  (drag to walk in that direction) and mouse eyes, a three.js chase camera
+  (drag up/down to walk, left/right to turn).
+- Keyboard: arrows or WASD to move, Space to squeak, Esc to pause.
+- Silly surprises: bonking walls, slipping on banana peels, popping
+  balloons, hopping frogs, and tapping anything visible for a reaction. All
+  sounds are generated in the browser; the only asset is three.js in
+  `k-maze/src/vendor/`.
+- Works fully offline, with the same update banner as Color Fun!.
+
+The maze generator lives in `k-maze/src/maze.js` and the game in
+`k-maze/src/app.js`; bump `VERSION` in `k-maze/src/sw.js` after changing
+them.
 
 ## Piano Fun!
 

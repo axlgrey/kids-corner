@@ -1,0 +1,16 @@
+{
+  "name": "Maze Mouse!",
+  "short_name": "Maze Mouse",
+  "description": "A kid-friendly maze game: help the mouse find the cheese, from above or through its eyes, with a flashlight in the dark.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#2b2d42",
+  "theme_color": "#ffbe0b",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
