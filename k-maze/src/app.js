@@ -1,12 +1,12 @@
 import * as THREE from "./vendor/three.module.min.js";
-import { makeMaze, solid, move, castRay, canSee } from "./maze.js";
+import { makeMaze, solid, move, castRay, canSee, pathTo } from "./maze.js";
 
 const $ = (sel) => document.querySelector(sel);
 const STORE = "kmaze-v1";
 const saved = (() => {
   try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; }
 })();
-const settings = { sound: true, view: "2d", best: {}, ...saved };
+const settings = { sound: true, view: "2d", hint: false, best: {}, ...saved };
 const persist = () => {
   try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
 };
@@ -214,6 +214,7 @@ const startGame = (d) => {
   starsAll = things.filter((t) => t.type === "star").length;
 
   build3d();
+  syncHint();
   syncHud();
   hide("#menu", "#over", "#pause");
   $("#hud").hidden = false;
@@ -230,6 +231,24 @@ const openDoor = (i, j) => {
   wordAt(i + 0.5, j + 0.5, "Unlocked!", "#ffd60a");
   bitsAt(i + 0.5, j + 0.5, ["✨", "🔑", "⭐"], 10);
   if (door3d) door3d.userData.opening = true;
+};
+
+// ---- Hint trail: the shortest way to the key (if still needed), then the cheese ----
+let hintPath = [];
+let hintCool = 0;
+const hintTarget = () => things.find((t) => !t.gone && t.type === (hasKey ? "cheese" : "key"));
+const updateHint = (dt) => {
+  hintCool -= dt;
+  if (!settings.hint || !maze || hintCool > 0) return;
+  hintCool = 0.2;
+  const t = hintTarget();
+  hintPath = t ? [{ x: player.x, y: player.y }, ...pathTo(maze, player.x, player.y, t.x, t.y, hasKey)] : [];
+  if (hintPath.length > 1) hintPath[hintPath.length - 1] = { x: t.x, y: t.y };
+};
+const syncHint = () => {
+  $("#hintBtn").classList.toggle("on", settings.hint);
+  if (!settings.hint) hintPath = [];
+  hintCool = 0;
 };
 
 // ---- Player update ----
@@ -677,6 +696,25 @@ const render2d = () => {
     }
   }
   const now = performance.now() / 1000;
+  if (settings.hint && hintPath.length > 1) {
+    g.save();
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.beginPath();
+    hintPath.forEach((p, n) => {
+      const s = screen2d(p.x, p.y);
+      if (n) g.lineTo(s.x, s.y); else g.moveTo(s.x, s.y);
+    });
+    g.strokeStyle = "rgba(255, 214, 10, 0.35)";
+    g.lineWidth = T * 0.35;
+    g.stroke();
+    g.setLineDash([T * 0.15, T * 0.25]);
+    g.lineDashOffset = -now * T * 1.5;
+    g.strokeStyle = "#ffbe0b";
+    g.lineWidth = T * 0.12;
+    g.stroke();
+    g.restore();
+  }
   // Things on the floor, then bouncy ones.
   for (const t of things) {
     if (!visible(t.x, t.y, t.type === "ghost" ? 1.5 : 0)) continue;
@@ -706,7 +744,27 @@ const render2d = () => {
   }
   const me = screen2d(player.x, player.y);
   drawMouse2d(g, me.x, me.y, T * 0.95);
-  if (cfg.dark) drawDark();
+  if (cfg.dark) {
+    drawDark();
+    // Keep the trail faintly visible through the dark so it can guide.
+    if (settings.hint && hintPath.length > 1) {
+      g.save();
+      g.globalAlpha = 0.5;
+      g.lineCap = "round";
+      g.lineJoin = "round";
+      g.setLineDash([T * 0.15, T * 0.25]);
+      g.lineDashOffset = -now * T * 1.5;
+      g.beginPath();
+      hintPath.forEach((p, n) => {
+        const s = screen2d(p.x, p.y);
+        if (n) g.lineTo(s.x, s.y); else g.moveTo(s.x, s.y);
+      });
+      g.strokeStyle = "#ffbe0b";
+      g.lineWidth = T * 0.12;
+      g.stroke();
+      g.restore();
+    }
+  }
 };
 
 // ================= 3D view (mouse eyes) =================
@@ -881,6 +939,40 @@ const build3d = () => {
   scene.fog = cfg.dark ? new THREE.Fog(0x05050f, 1, cfg.range + 0.8) : null;
 };
 
+// Hint trail in 3D: glowing dots on the floor (unaffected by fog/light).
+const HINT_MAX = 600;
+const hintDots = new THREE.InstancedMesh(
+  new THREE.CircleGeometry(0.07, 12),
+  new THREE.MeshBasicMaterial({ color: 0xffbe0b, fog: false, transparent: true, opacity: 0.9 }),
+  HINT_MAX
+);
+hintDots.frustumCulled = false;
+hintDots.count = 0;
+scene.add(hintDots);
+const hintM4 = new THREE.Matrix4();
+const hintRot = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
+const updateHintDots = (now) => {
+  let n = 0;
+  if (settings.hint) {
+    const gap = 0.3;
+    let carry = (now * 0.6) % gap;
+    for (let k = 1; k < hintPath.length && n < HINT_MAX; k++) {
+      const a = hintPath[k - 1];
+      const b = hintPath[k];
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      for (let d = carry; d < len && n < HINT_MAX; d += gap) {
+        const f = d / len;
+        hintM4.copy(hintRot).setPosition(a.x + (b.x - a.x) * f, 0.02, a.y + (b.y - a.y) * f);
+        hintDots.setMatrixAt(n++, hintM4);
+      }
+      carry = (carry - len) % gap;
+      if (carry < 0) carry += gap;
+    }
+  }
+  hintDots.count = n;
+  hintDots.instanceMatrix.needsUpdate = true;
+};
+
 const camPos = new THREE.Vector3();
 const lookAt = new THREE.Vector3();
 const proj = new THREE.Vector3();
@@ -945,6 +1037,7 @@ const render3d = () => {
     sp.position.set(t.x, y, t.y);
     sp.scale.set(s, s, 1);
   }
+  updateHintDots(now);
   renderer.render(scene, camera);
 };
 
@@ -1085,6 +1178,12 @@ document.querySelectorAll(".view-btn").forEach((b) => {
   };
 });
 $("#viewBtn").onclick = switchView;
+$("#hintBtn").onclick = () => {
+  settings.hint = !settings.hint;
+  persist();
+  syncHint();
+  Sfx.play(settings.hint ? "sparkle" : "click");
+};
 $("#soundBtn").onclick = toggleSound;
 $("#hudSoundBtn").onclick = toggleSound;
 $("#pauseBtn").onclick = pause;
@@ -1104,6 +1203,7 @@ const loop = (now) => {
     updateFlicker(dt);
     updatePlayer(dt);
     updateThings(dt);
+    updateHint(dt);
     $("#timeText").textContent = `⏱️ ${fmt(elapsed)}`;
   } else if (mode === "won") {
     updatePlayer(0);

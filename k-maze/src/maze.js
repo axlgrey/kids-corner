@@ -120,3 +120,33 @@ export const canSee = (m, x1, y1, x2, y2) => {
   const d = Math.hypot(x2 - x1, y2 - y1);
   return castRay(m, x1, y1, Math.atan2(y2 - y1, x2 - x1), d) >= d - 0.01;
 };
+
+// Shortest tile path from (x1, y1) to (x2, y2) as tile centers, by
+// breadth-first search. Walls (1) block; locked doors (2) pass only if
+// `doors` is true. Returns [] when there is no way through.
+export const pathTo = (m, x1, y1, x2, y2, doors = true) => {
+  const start = Math.floor(y1) * m.w + Math.floor(x1);
+  const goal = Math.floor(y2) * m.w + Math.floor(x2);
+  const from = new Int32Array(m.w * m.h).fill(-1);
+  from[start] = start;
+  const queue = [start];
+  for (let q = 0; q < queue.length && from[goal] < 0; q++) {
+    const k = queue[q];
+    const i = k % m.w;
+    const j = (k - i) / m.w;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const ni = i + dx;
+      const nj = j + dy;
+      if (ni < 0 || nj < 0 || ni >= m.w || nj >= m.h) continue;
+      const n = nj * m.w + ni;
+      const v = m.grid[n];
+      if (from[n] >= 0 || v === 1 || (v === 2 && !doors)) continue;
+      from[n] = k;
+      queue.push(n);
+    }
+  }
+  if (from[goal] < 0) return [];
+  const path = [];
+  for (let k = goal; k !== start; k = from[k]) path.push({ x: (k % m.w) + 0.5, y: Math.floor(k / m.w) + 0.5 });
+  return path.reverse();
+};
