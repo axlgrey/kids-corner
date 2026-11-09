@@ -50,6 +50,14 @@ button { font-family: inherit; cursor: pointer; }
   .tool { width: 40px; height: 40px; font-size: 1.1rem; }
   .tools { gap: 4px; }
 }
+/* Narrow portrait: title on its own row, buttons share the full width
+   below it and shrink to fit instead of running off the screen. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .toolbar { flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px 8px; }
+  .title { width: 100%; text-align: center; }
+  .tools { width: 100%; justify-content: space-between; gap: 4px; }
+  .tool { flex: 1 1 0; width: auto; max-width: 52px; min-width: 0; height: 40px; }
+}
 
 .stage {
   position: relative;
