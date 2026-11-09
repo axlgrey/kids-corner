@@ -783,7 +783,7 @@
       }
     },
     {
-      id: "scar", emoji: "🩹", name: "Pirate Scar", anchor: "eyes", layer: 3, sound: "slash",
+      id: "scar", emoji: "🩹", name: "Pirate Scar", anchor: "eyes", layer: 4.5, sound: "slash",
       draw(ctx) {
         // Curved scar under one eye with stitches, like a famous rubber pirate.
         const x = -0.5;

@@ -3,7 +3,33 @@ const STORE = "sillyfaces-v1";
 const saved = (() => {
   try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; }
 })();
-const settings = { selected: ["glasses", "nose"], sound: true, facing: "user", ...saved };
+const settings = { selected: ["glasses", "nose"], sound: true, facing: "user", image: "auto", detect: "auto", ...saved };
+
+// ---- Quality ----
+// Image: camera resolution and canvas sharpness. Detection: size of the
+// frame the face model sees, how many faces, and how often it runs.
+const IMAGE_LEVELS = {
+  low:    { w: 640,  h: 480, dpr: 1 },
+  medium: { w: 960,  h: 540, dpr: 1.5 },
+  high:   { w: 1280, h: 720, dpr: 2 }
+};
+const DETECT_LEVELS = {
+  low:    { width: 320, faces: 1, gap: 120 },
+  medium: { width: 480, faces: 2, gap: 50 },
+  high:   { width: 640, faces: 4, gap: 0 }
+};
+// Guess a level from the device: CPU cores, memory (Chrome only) and
+// whether the face model fell back to the slow CPU backend.
+let backendName = "";
+const autoLevel = () => {
+  const cores = navigator.hardwareConcurrency || 4;
+  const mem = navigator.deviceMemory || 4;
+  if (backendName === "cpu" || cores <= 4 || mem <= 2) return "low";
+  if (cores <= 6 || mem <= 4) return "medium";
+  return "high";
+};
+const imageLevel = () => IMAGE_LEVELS[settings.image] || IMAGE_LEVELS[autoLevel()];
+const detectLevel = () => DETECT_LEVELS[settings.detect] || DETECT_LEVELS[autoLevel()];
 const persist = () => {
   try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
 };
@@ -258,8 +284,10 @@ let lastResult = null;
 let resultFresh = false;
 
 // TensorFlow.js face mesh (tfjs runtime), all files served locally.
+let landmarkerFaces = 0;
 const loadModel = async () => {
-  if (landmarker) return landmarker;
+  if (landmarker && landmarkerFaces === detectLevel().faces) return landmarker;
+  if (landmarker) { try { landmarker.dispose(); } catch {} landmarker = null; }
   const tf = window.tf;
   let ok = false;
   for (const name of ["webgpu", "webgl", "cpu"]) {
@@ -270,35 +298,40 @@ const loadModel = async () => {
     } catch {
       ok = false;
     }
-    if (ok) break;
+    if (ok) { backendName = name; break; }
   }
   const fld = window.faceLandmarksDetection;
   landmarker = await fld.createDetector(fld.SupportedModels.MediaPipeFaceMesh, {
     runtime: "tfjs",
-    maxFaces: 4,
+    maxFaces: detectLevel().faces,
     refineLandmarks: false,
     detectorModelUrl: new URL("vendor/tfjs/detector/model.json", location.href).href,
     landmarkModelUrl: new URL("vendor/tfjs/mesh/model.json", location.href).href
   });
+  landmarkerFaces = detectLevel().faces;
   return landmarker;
 };
 
 // Show the camera at full quality, but run detection on a smaller copy:
 // the face models work at 128-192 px anyway, so this keeps tracking fast.
-const DETECT_WIDTH = 640;
 const detectCanvas = document.createElement("canvas");
 const detectCtx = detectCanvas.getContext("2d");
 let lastDetectScale = 1;
 let busy = false;
+let lastDetectAt = 0;
 const track = async () => {
-  if (busy || video.currentTime === lastVideoTime) return;
+  if (busy || !landmarker || video.currentTime === lastVideoTime) return;
+  const level = detectLevel();
+  const now = performance.now();
+  if (now - lastDetectAt < level.gap) return;
+  lastDetectAt = now;
   syncVideoSize();
   busy = true;
   lastVideoTime = video.currentTime;
   try {
     const vw = video.videoWidth;
     const vh = video.videoHeight;
-    const ratio = Math.min(1, DETECT_WIDTH / vw);
+    const ratio = Math.min(1, level.width / vw);
     const dw = Math.round(vw * ratio);
     const dh = Math.round(vh * ratio);
     if (detectCanvas.width !== dw || detectCanvas.height !== dh) {
@@ -327,7 +360,7 @@ video.addEventListener("resize", syncVideoSize);
 const startCamera = async () => {
   if (stream) stream.getTracks().forEach((track) => track.stop());
   stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: settings.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+    video: { facingMode: settings.facing, width: { ideal: imageLevel().w }, height: { ideal: imageLevel().h } },
     audio: false
   });
   video.srcObject = stream;
@@ -363,6 +396,40 @@ const start = async () => {
 };
 $("#startBtn").onclick = start;
 
+// ---- Quality settings panel ----
+const qualityBox = $("#qualityBox");
+const LEVEL_NAMES = { auto: "🤖 Auto", low: "🐢 Low", medium: "🙂 Medium", high: "🚀 High" };
+const renderQuality = () => {
+  [["image", "#imageLevels"], ["detect", "#detectLevels"]].forEach(([key, sel]) => {
+    const box = $(sel);
+    box.innerHTML = "";
+    Object.entries(LEVEL_NAMES).forEach(([level, label]) => {
+      const btn = document.createElement("button");
+      btn.className = "level-btn" + (settings[key] === level ? " on" : "");
+      btn.textContent = level === "auto" ? `${label} (${autoLevel()})` : label;
+      btn.onclick = () => setQuality(key, level);
+      box.appendChild(btn);
+    });
+  });
+};
+const setQuality = async (key, level) => {
+  if (settings[key] === level) return;
+  settings[key] = level;
+  persist();
+  play("pop");
+  renderQuality();
+  try {
+    if (key === "image" && stream) await startCamera();
+    if (key === "detect" && landmarker) {
+      while (busy) await new Promise((res) => setTimeout(res, 20));
+      await loadModel();
+    }
+  } catch (err) { console.error(err); }
+};
+$("#qualityBtn").onclick = () => { renderQuality(); qualityBox.hidden = false; play("pop"); };
+$("#qualityClose").onclick = () => { qualityBox.hidden = true; };
+qualityBox.onclick = (e) => { if (e.target === qualityBox) qualityBox.hidden = true; };
+
 $("#flipBtn").onclick = async () => {
   settings.facing = settings.facing === "user" ? "environment" : "user";
   persist();
@@ -374,7 +441,7 @@ $("#flipBtn").onclick = async () => {
 
 const resize = () => {
   const rect = canvas.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, imageLevel().dpr);
   const w = Math.round(rect.width * dpr);
   const h = Math.round(rect.height * dpr);
   if (canvas.width !== w || canvas.height !== h) {

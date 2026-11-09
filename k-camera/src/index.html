@@ -21,6 +21,7 @@
       <button id="randomBtn" class="tool" aria-label="Surprise me">🎲</button>
       <button id="clearBtn" class="tool" aria-label="Remove all">🧽</button>
       <button id="soundBtn" class="tool on" aria-label="Sound">🔊</button>
+      <button id="qualityBtn" class="tool" aria-label="Quality">⚙️</button>
       <button id="flipBtn" class="tool" aria-label="Switch camera">🔄</button>
       <button class="tool fullscreen-btn" aria-label="Fullscreen">⛶</button>
     </div>
@@ -49,6 +50,17 @@
       <img id="photoImg" class="photo" alt="Your silly photo">
       <a id="saveBtn" class="big-btn" download="silly-face.png">💾 Save</a>
       <button id="photoClose" class="big-btn alt">Back</button>
+    </div>
+  </div>
+
+  <div id="qualityBox" class="celebrate" hidden>
+    <div class="celebrate-box quality-box">
+      <h2>📷 Picture</h2>
+      <div id="imageLevels" class="levels"></div>
+      <h2>🧠 Face tracking</h2>
+      <div id="detectLevels" class="levels"></div>
+      <p class="quality-hint">Slow phone? Try 🐢 Low.</p>
+      <button id="qualityClose" class="big-btn alt">Done</button>
     </div>
   </div>
 
