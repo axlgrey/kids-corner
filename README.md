@@ -15,6 +15,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Maze Mouse!: <https://axlgrey.github.io/kids-corner/k-maze/src/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 - Silly Faces!: <https://axlgrey.github.io/kids-corner/k-camera/src/>
+- Spot It!: <https://axlgrey.github.io/kids-corner/k-diff/src/>
 
 ## Apps
 
@@ -29,6 +30,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Maze Mouse! | [`k-maze/src/`](k-maze/src/) | A maze game: help the mouse find the cheese, from above or through its eyes. |
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 | Silly Faces! | [`k-camera/src/`](k-camera/src/) | A camera that puts glasses, clown noses, sleepy eyes and more on every face. |
+| Spot It! | [`k-diff/src/`](k-diff/src/) | A spot-the-difference game with silly sounds and animations. |
 
 ## Balloon Pop!
 
@@ -170,6 +172,8 @@ Categories and stickers live in `k-match/src/data.js`; bump `VERSION` in
 - Two views, switchable any time with the HUD button or `V`: from above
   (drag to walk in that direction) and mouse eyes, a three.js chase camera
   (drag up/down to walk, left/right to turn).
+- Hint button: shows a trail along the shortest way to the key (when still
+  needed), then to the cheese.
 - Keyboard: arrows or WASD to move, Space to squeak, Esc to pause.
 - Silly surprises: bonking walls, slipping on banana peels, popping
   balloons, hopping frogs, and tapping anything visible for a reaction. All
@@ -213,6 +217,8 @@ them.
   more) generated in the browser, plus an emoji burst.
 - Open your mouth wide for a "wow" and confetti; tap a face to make it
   giggle.
+- Picture and face-tracking quality settings (auto by default) to keep
+  things smooth on slow phones.
 - Random silly look, remove all, sound on/off, front/back camera switch, and
   take and save a photo.
 - Face tracking runs entirely on the device with TensorFlow.js and
@@ -225,6 +231,21 @@ Items live in `k-camera/src/items.js`: each has an `anchor` (`eyes`,
 `nose`, `lip`, `mouth`, `chin`, `top`), a `layer`, a `sound` from `SOUNDS`
 in `k-camera/src/app.js` and a `draw(ctx, face, t)` function, measured in
 eye distances. Bump `VERSION` in `k-camera/src/sw.js` after changing them.
+
+## Spot It!
+
+- Two pictures side by side: tap the things that are different.
+- 6 themes: Park, Sea, Space, Farm, Kitchen and Silly Town. Every round is
+  randomly generated, so no two games are the same.
+- Differences: something ran away, a switcheroo, new colors, upside down, or
+  bigger/smaller, each announced with a silly sound and animation.
+- Three modes: Easy (3 differences), Normal (5) and Hard (7, with more and
+  smaller things). The best time per mode and stars per theme are saved.
+- Hint button, timer, and voice and sound toggles.
+- Works fully offline, with the same update banner as Color Fun!.
+
+Themes and change types live in `k-diff/src/data.js`; bump `VERSION` in
+`k-diff/src/sw.js` after changing them.
 
 ## Adding a New App
 
