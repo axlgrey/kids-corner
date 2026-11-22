@@ -114,8 +114,8 @@ export const buildWorld = (scene) => {
     const branch = add(g, cyl(0.05, 0.08, 0.8, 8), trunkMat, toward.x * 0.4, by, toward.z * 0.4);
     branch.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), toward);
     spot(x + toward.x * 0.55, by + 0.06, z + toward.z * 0.55, "tree", { size: 0.9 });
-    spot(x + toward.x * 0.1, h - 0.5, z + toward.z * 0.1, "tree", { hidden: true, size: 0.8 });
-    spot(x - toward.x * 0.45 + toward.z * 0.3, 0, z - toward.z * 0.45 - toward.x * 0.3, "ground", { hidden: true });
+    spot(x + toward.x * 0.95, h - 0.75, z + toward.z * 0.95, "tree", { hidden: true, size: 0.8 });
+    spot(x - toward.x * 0.2 + toward.z * 0.4, 0, z - toward.z * 0.2 - toward.x * 0.4, "ground", { hidden: true });
     thing(g, "rustle", "rustle", "Rustle rustle!");
     return g;
   };

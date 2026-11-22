@@ -342,7 +342,7 @@ const putAt = (a, s) => {
   obj.position.z += rand(-0.05, 0.05);
   facePlayer(obj);
   obj.scale.setScalar(s.size * (a.animal.id === "bear" ? 1 : 1.15));
-  a.hideY = s.pos.y - (s.peek || 0);
+  a.hideY = s.pos.y - (s.peek || 0) * 0.6;
   a.showY = s.pos.y;
   a.up = s.peek ? 0 : 1;
   obj.position.y = s.peek ? a.hideY : a.showY;
@@ -636,7 +636,7 @@ const nextTarget = () => {
   sinceFind = 0;
   hintOn = false;
   $("#arrow").hidden = true;
-  if (!current) { setTimeout(endGame, 1600); return; }
+  if (!current) { setTimeout(endGame, 600); return; }
   const it = current.animal;
   $("#targetEmoji").textContent = it.emoji;
   $("#targetName").textContent = it.name;
@@ -677,26 +677,49 @@ const foundAnimal = (a) => {
     addRing(x, y);
   }, 400);
   say(`${pick(YAY_WORDS)} The ${a.animal.name}!`);
-  // After the fright: a happy spin, then it hops toward you and waves bye.
+  // Jump out of the hiding spot into the open, do a happy dance, then hop away.
   const obj = a.obj;
   setTimeout(() => {
     const start = obj.position.clone();
-    const s0 = obj.scale.x;
-    animate(obj, 1.5, (k) => {
-      const goal = camera.position.clone().addScaledVector(camera.getWorldDirection(new THREE.Vector3()), 1.2);
-      goal.y -= 0.5;
-      const e = k * k * (3 - 2 * k);
-      obj.position.lerpVectors(start, goal, e);
-      obj.position.y += Math.abs(Math.sin(k * Math.PI * 4)) * 0.25 * (1 - k);
-      obj.rotation.y += 0.3;
-      obj.scale.setScalar(s0 * (1 + Math.sin(k * Math.PI) * 0.3) * (1 - k * 0.9));
+    const s0 = a.spot.size * 1.15;
+    const out = new THREE.Vector3(start.x - camera.position.x, 0, start.z - camera.position.z);
+    const dist = Math.max(1.6, Math.min(2.2, out.length() * 0.6));
+    const land = camera.position.clone().add(out.setLength(dist));
+    land.y = 0;
+    const r0 = obj.rotation.y;
+    Sfx.play("boing", panOf(obj));
+    animate(obj, 2.6, (k) => {
+      const face = Math.atan2(camera.position.x - obj.position.x, camera.position.z - obj.position.z);
+      if (k < 0.25) {
+        const j = k / 0.25;
+        obj.position.lerpVectors(start, land, j);
+        obj.position.y += Math.sin(j * Math.PI) * (0.9 + start.y * 0.3);
+        obj.rotation.y = r0 + j * Math.PI * 2;
+        obj.scale.setScalar(s0 * (1 + j * 0.4));
+      } else if (k < 0.8) {
+        const j = (k - 0.25) / 0.55;
+        obj.position.copy(land);
+        obj.position.y = Math.abs(Math.sin(j * Math.PI * 4)) * 0.25;
+        obj.rotation.y = face + Math.sin(j * Math.PI * 4) * 0.5;
+        obj.rotation.z = Math.sin(j * Math.PI * 8) * 0.15;
+        const sq = 1 + Math.sin(j * Math.PI * 8) * 0.08;
+        obj.scale.set(s0 * 1.4 / sq, s0 * 1.4 * sq, s0 * 1.4 / sq);
+      } else {
+        const j = (k - 0.8) / 0.2;
+        obj.position.copy(land);
+        obj.position.y = Math.sin(j * Math.PI) * 0.6;
+        obj.rotation.y = face + j * Math.PI * 4;
+        obj.rotation.z = 0;
+        obj.scale.setScalar(s0 * 1.4 * (1 - j));
+      }
     }, () => { obj.visible = false; });
-    Sfx.play("whoosh");
-  }, 1000);
+    setTimeout(() => Sfx.play(a.animal.sound, panOf(obj)), 1100);
+    setTimeout(() => Sfx.play("whoosh"), 2100);
+  }, 350);
   setTimeout(() => {
     $("#countText").textContent = `${found.length}/${DIFF[diff].count}`;
     nextTarget();
-  }, 2000);
+  }, 3000);
   current = null;
 };
 
