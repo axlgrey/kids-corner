@@ -13,7 +13,10 @@ const IMAGE_LEVELS = {
   medium: { w: 960,  h: 540, dpr: 1.5 },
   high:   { w: 1280, h: 720, dpr: 2 }
 };
+// turbo: BlazeFace only (6 points, no face mesh), several times faster on
+// weak phones; anchors are estimated, mouth-open "wow" is off.
 const DETECT_LEVELS = {
+  turbo:  { width: 320, faces: 2, gap: 0, fast: true },
   low:    { width: 320, faces: 1, gap: 120 },
   medium: { width: 480, faces: 2, gap: 50 },
   high:   { width: 640, faces: 4, gap: 0 }
@@ -29,7 +32,12 @@ const autoLevel = () => {
   return "high";
 };
 const imageLevel = () => IMAGE_LEVELS[settings.image] || IMAGE_LEVELS[autoLevel()];
-const detectLevel = () => DETECT_LEVELS[settings.detect] || DETECT_LEVELS[autoLevel()];
+const autoDetect = () => {
+  const level = autoLevel();
+  const cores = navigator.hardwareConcurrency || 4;
+  return level === "low" && (backendName === "cpu" || cores <= 4) ? "turbo" : level;
+};
+const detectLevel = () => DETECT_LEVELS[settings.detect] || DETECT_LEVELS[autoDetect()];
 const persist = () => {
   try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
 };
@@ -283,10 +291,12 @@ let lastVideoTime = -1;
 let lastResult = null;
 let resultFresh = false;
 
-// TensorFlow.js face mesh (tfjs runtime), all files served locally.
-let landmarkerFaces = 0;
+// TensorFlow.js face mesh (tfjs runtime), or BlazeFace alone in turbo
+// mode; all files served locally.
+let landmarkerKey = "";
+const modelKey = () => `${detectLevel().faces}:${!!detectLevel().fast}`;
 const loadModel = async () => {
-  if (landmarker && landmarkerFaces === detectLevel().faces) return landmarker;
+  if (landmarker && landmarkerKey === modelKey()) return landmarker;
   if (landmarker) { try { landmarker.dispose(); } catch {} landmarker = null; }
   const tf = window.tf;
   let ok = false;
@@ -300,15 +310,28 @@ const loadModel = async () => {
     }
     if (ok) { backendName = name; break; }
   }
+  const detectorModelUrl = new URL("vendor/tfjs/detector/model.json", location.href).href;
+  if (detectLevel().fast) {
+    const fd = window.faceDetection;
+    landmarker = await fd.createDetector(fd.SupportedModels.MediaPipeFaceDetector, {
+      runtime: "tfjs",
+      modelType: "short",
+      maxFaces: detectLevel().faces,
+      detectorModelUrl
+    });
+    landmarker.fast = true;
+    landmarkerKey = modelKey();
+    return landmarker;
+  }
   const fld = window.faceLandmarksDetection;
   landmarker = await fld.createDetector(fld.SupportedModels.MediaPipeFaceMesh, {
     runtime: "tfjs",
     maxFaces: detectLevel().faces,
     refineLandmarks: false,
-    detectorModelUrl: new URL("vendor/tfjs/detector/model.json", location.href).href,
+    detectorModelUrl,
     landmarkModelUrl: new URL("vendor/tfjs/mesh/model.json", location.href).href
   });
-  landmarkerFaces = detectLevel().faces;
+  landmarkerKey = modelKey();
   return landmarker;
 };
 
@@ -339,9 +362,10 @@ const track = async () => {
       detectCanvas.height = dh;
     }
     detectCtx.drawImage(video, 0, 0, dw, dh);
-    const faces = await landmarker.estimateFaces(detectCanvas, { flipHorizontal: false });
+    const model = landmarker;
+    const faces = await model.estimateFaces(detectCanvas, { flipHorizontal: false });
     lastDetectScale = 1 / ratio;
-    lastResult = faces;
+    lastResult = faces.map((face) => ({ keypoints: face.keypoints, fast: !!model.fast }));
     resultFresh = true;
   } catch (err) {
     console.error(err);
@@ -403,10 +427,12 @@ const renderQuality = () => {
   [["image", "#imageLevels"], ["detect", "#detectLevels"]].forEach(([key, sel]) => {
     const box = $(sel);
     box.innerHTML = "";
-    Object.entries(LEVEL_NAMES).forEach(([level, label]) => {
+    const names = key === "detect" ? { ...LEVEL_NAMES, turbo: "⚡ Turbo" } : LEVEL_NAMES;
+    Object.entries(names).forEach(([level, label]) => {
       const btn = document.createElement("button");
       btn.className = "level-btn" + (settings[key] === level ? " on" : "");
-      btn.textContent = level === "auto" ? `${label} (${autoLevel()})` : label;
+      const auto = key === "detect" ? autoDetect() : autoLevel();
+      btn.textContent = level === "auto" ? `${label} (${auto})` : label;
       btn.onclick = () => setQuality(key, level);
       box.appendChild(btn);
     });
@@ -475,6 +501,34 @@ const faceInfo = (marks, map) => {
     mouth: mid(p(L.lipIn), p(L.lipLow)),
     chin: p(L.chin),
     top: p(L.top)
+  };
+};
+
+// Turbo mode: build the same anchors from BlazeFace's 6 points (eyes, nose
+// tip, mouth center, ears). Chin and head top are estimated from face
+// proportions along the line perpendicular to the eyes.
+const fastFaceInfo = (marks, map) => {
+  const pts = marks.map(map);
+  let eyeA = pts[0];
+  let eyeB = pts[1];
+  if (eyeA.x > eyeB.x) [eyeA, eyeB] = [eyeB, eyeA];
+  const unit = dist(eyeA, eyeB);
+  const angle = Math.atan2(eyeB.y - eyeA.y, eyeB.x - eyeA.x);
+  const down = { x: -Math.sin(angle), y: Math.cos(angle) };
+  const eyes = mid(eyeA, eyeB);
+  const nose = pts[2];
+  const mouth = pts[3];
+  const along = (from, k) => ({ x: from.x + down.x * unit * k, y: from.y + down.y * unit * k });
+  return {
+    unit,
+    angle,
+    mouthOpen: 0,
+    eyes,
+    nose,
+    lip: mid(along(mouth, -0.12), nose),
+    mouth,
+    chin: along(mouth, 0.75),
+    top: along(eyes, -1.15)
   };
 };
 
@@ -610,7 +664,7 @@ const loop = (now) => {
   };
   if (resultFresh) {
     resultFresh = false;
-    updateTracks((lastResult || []).map((face) => faceInfo(face.keypoints, map)), now);
+    updateTracks((lastResult || []).map((face) => (face.fast ? fastFaceInfo : faceInfo)(face.keypoints, map)), now);
   } else {
     updateTracks([], now);
   }
