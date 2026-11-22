@@ -1,6 +1,6 @@
 // Service worker: precaches the whole app so it works fully offline.
 // Bump VERSION whenever files change to force clients to refresh the cache.
-const VERSION = "v17";
+const VERSION = "v18";
 const CACHE = `sillyfaces-${VERSION}`;
 
 const APP_FILES = [
@@ -8,13 +8,15 @@ const APP_FILES = [
   "index.html",
   "style.css",
   "app.js",
+  "face-worker.js",
   "items.js",
   "vendor/tfjs/tf.min.js",
   "vendor/tfjs/tf-backend-webgpu.min.js",
+  "vendor/tfjs/tf-backend-wasm.min.js",
+  "vendor/tfjs/tfjs-backend-wasm.wasm",
+  "vendor/tfjs/tfjs-backend-wasm-simd.wasm",
   "vendor/tfjs/face-landmarks-detection.min.js",
   "vendor/tfjs/face-detection.min.js",
-  "vendor/jeeliz/jeelizFaceFilter.module.js",
-  "vendor/jeeliz/NN_4EXPR_1.json",
   "vendor/tfjs/detector/model.json",
   "vendor/tfjs/detector/group1-shard1of1.bin",
   "vendor/tfjs/mesh/model.json",
