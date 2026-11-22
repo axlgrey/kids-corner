@@ -184,6 +184,8 @@ const startGame = (d) => {
   player = newPlayer(maze.start.x, maze.start.y);
   player.a = solid(maze, maze.start.i + 1, maze.start.j) ? Math.PI / 2 : 0;
   hasKey = !cfg.key;
+  blinks = [];
+  flickerT = rand(4, 9);
   starsGot = 0;
   elapsed = 0;
   things = [];
@@ -499,16 +501,21 @@ const updateThings = (dt) => {
   things = things.filter((t) => !t.gone);
 };
 
-// Flashlight battery wobble on Hard.
-let flickerT = 0;
+// Hard: every so often the flashlight blinks off and on a few times.
+let flickerT = rand(4, 9);
+let blinks = [];
 const updateFlicker = (dt) => {
-  flickerT -= dt;
   if (diff !== "hard") { flicker = 1; return; }
-  if (flickerT <= 0) {
-    flickerT = rand(3, 8);
-    flicker = 0.35;
+  flickerT -= dt;
+  if (flickerT <= 0 && !blinks.length) {
+    flickerT = rand(6, 12);
+    const n = 2 + Math.floor(rand(0, 3));
+    for (let k = 0; k < n; k++) blinks.push(rand(0.05, 0.12), rand(0.04, 0.15));
   }
-  flicker = Math.min(1, flicker + dt * (flicker < 0.6 ? 0.8 : 2));
+  if (!blinks.length) { flicker = 1; return; }
+  blinks[0] -= dt;
+  flicker = blinks.length % 2 === 0 ? 0.08 : 1;
+  if (blinks[0] <= 0) blinks.shift();
 };
 
 // ================= 2D view (from above) =================
@@ -621,7 +628,7 @@ const drawDark = () => {
   dg.globalCompositeOperation = "source-over";
   dg.clearRect(0, 0, dark.width, dark.height);
   dg.setTransform(dpr, 0, 0, dpr, 0, 0);
-  dg.fillStyle = "rgba(5, 5, 20, 0.97)";
+  dg.fillStyle = "rgba(0, 0, 0, 0.97)";
   dg.fillRect(0, 0, W, H);
   dg.globalCompositeOperation = "destination-out";
   const p = screen2d(player.x, player.y);
@@ -935,8 +942,8 @@ const build3d = () => {
   torch.visible = cfg.dark;
   torch.angle = cfg.cone / 2;
   torch.distance = cfg.range + 1.5;
-  scene.background = new THREE.Color(cfg.dark ? 0x05050f : 0x9bd4ff);
-  scene.fog = cfg.dark ? new THREE.Fog(0x05050f, 1, cfg.range + 0.8) : null;
+  scene.background = new THREE.Color(cfg.dark ? 0x000000 : 0x2b2d42);
+  scene.fog = cfg.dark ? new THREE.Fog(0x000000, 1, cfg.range + 0.8) : null;
 };
 
 // Hint trail in 3D: glowing dots on the floor (unaffected by fog/light).
