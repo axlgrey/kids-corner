@@ -1,0 +1,16 @@
+{
+  "name": "Torch Night!",
+  "short_name": "Torch Night",
+  "description": "A kid-friendly 3D torchlight game: shine your torch around a night garden and surprise the animals.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#0b1033",
+  "theme_color": "#0b1033",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

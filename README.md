@@ -16,6 +16,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Piano Fun!: <https://axlgrey.github.io/kids-corner/k-piano/src/>
 - Silly Faces!: <https://axlgrey.github.io/kids-corner/k-camera/src/>
 - Spot It!: <https://axlgrey.github.io/kids-corner/k-diff/src/>
+- Torch Night!: <https://axlgrey.github.io/kids-corner/k-torch/src/>
 
 ## Apps
 
@@ -31,6 +32,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Piano Fun! | [`k-piano/src/`](k-piano/src/) | Tap colorful keys, switch instruments and learn simple songs. |
 | Silly Faces! | [`k-camera/src/`](k-camera/src/) | A camera that puts glasses, clown noses, sleepy eyes and more on every face. |
 | Spot It! | [`k-diff/src/`](k-diff/src/) | A spot-the-difference game with silly sounds and animations. |
+| Torch Night! | [`k-torch/src/`](k-torch/src/) | A 3D torchlight game: shine a torch around a night garden and surprise the animals. |
 
 ## Balloon Pop!
 
@@ -246,6 +248,33 @@ eye distances. Bump `VERSION` in `k-camera/src/sw.js` after changing them.
 
 Themes and change types live in `k-diff/src/data.js`; bump `VERSION` in
 `k-diff/src/sw.js` after changing them.
+
+## Torch Night!
+
+- A night garden in 3D: move the phone or tablet around (gyro) or drag to
+  point the torch, and find the animals hiding in trees, behind bushes, in
+  the pond and around the camp.
+- 14 animals, such as an owl, bat, frog, hedgehog, fox, bear and raccoon.
+  When the light lands on one, it jumps, shakes, says something silly with
+  its own sound, and a name tag pops up.
+- Four modes: Easy (3 animals, wide beam, glowing eyes, hint after 12 s),
+  Normal (5 animals, hint after 20 s), Hard (7 animals, narrow beam, no
+  glowing eyes, hidden spots, animals sneak away) and Free play (no target
+  or timer). The best time per mode is saved.
+- The animal to find calls out from its direction in stereo, so kids can
+  find it by listening.
+- Turn the torch off to see only shiny eyes in the dark. Trees, bushes, the
+  pond, mushrooms, the tent and the moon react when tapped.
+- Hint, voice, sound and gyro toggles; pinch or mouse wheel to zoom.
+- All 3D models are built from three.js shapes and all sounds are generated
+  in the browser; the only asset is three.js in `k-torch/src/vendor/`.
+- The gyro needs HTTPS (or localhost) and, on iPhone/iPad, permission,
+  which is asked when a mode is picked.
+- Works fully offline, with the same update banner as Color Fun!.
+
+Animals live in `k-torch/src/animals.js` and the garden in
+`k-torch/src/world.js`; bump `VERSION` in `k-torch/src/sw.js` after
+changing them.
 
 ## Adding a New App
 
