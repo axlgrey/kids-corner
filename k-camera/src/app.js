@@ -1,3 +1,5 @@
+import JEELIZFACEFILTER from "./vendor/jeeliz/jeelizFaceFilter.module.js";
+
 const $ = (sel) => document.querySelector(sel);
 const STORE = "sillyfaces-v1";
 const saved = (() => {
@@ -15,7 +17,10 @@ const IMAGE_LEVELS = {
 };
 // turbo: BlazeFace only (6 points, no face mesh), several times faster on
 // weak phones; anchors are estimated, mouth-open "wow" is off.
+// lite: Jeeliz FaceFilter (WebGL, tiny network, own tracking loop); the
+// fastest, gives only a head box and rotation, so anchors are estimated.
 const DETECT_LEVELS = {
+  lite:   { width: 320, faces: 2, gap: 0, lite: true },
   turbo:  { width: 320, faces: 2, gap: 0, fast: true },
   low:    { width: 320, faces: 1, gap: 120 },
   medium: { width: 480, faces: 2, gap: 50 },
@@ -37,7 +42,15 @@ const autoDetect = () => {
   const cores = navigator.hardwareConcurrency || 4;
   return level === "low" && (backendName === "cpu" || cores <= 4) ? "turbo" : level;
 };
-const detectLevel = () => DETECT_LEVELS[settings.detect] || DETECT_LEVELS[autoDetect()];
+// In auto mode, step down while detection is measured to be too slow.
+const AUTO_STEPS = ["high", "medium", "low", "turbo", "lite"];
+let autoFloor = 0;
+const autoPick = () => {
+  const base = AUTO_STEPS.indexOf(autoDetect());
+  const guess = base < 0 ? 2 : base;
+  return AUTO_STEPS[Math.max(guess, autoFloor)];
+};
+const detectLevel = () => DETECT_LEVELS[settings.detect] || DETECT_LEVELS[autoPick()];
 const persist = () => {
   try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch {}
 };
@@ -294,10 +307,24 @@ let resultFresh = false;
 // TensorFlow.js face mesh (tfjs runtime), or BlazeFace alone in turbo
 // mode; all files served locally.
 let landmarkerKey = "";
-const modelKey = () => `${detectLevel().faces}:${!!detectLevel().fast}`;
+const modelKey = () => `${detectLevel().faces}:${!!detectLevel().fast}:${!!detectLevel().lite}`;
 const loadModel = async () => {
   if (landmarker && landmarkerKey === modelKey()) return landmarker;
-  if (landmarker) { try { landmarker.dispose(); } catch {} landmarker = null; }
+  if (landmarker) {
+    try { await (landmarker.lite ? landmarker.dispose() : Promise.resolve(landmarker.dispose())); } catch {}
+    landmarker = null;
+  }
+  if (detectLevel().lite && !liteFailed) {
+    try {
+      landmarker = await startLite(detectLevel().faces);
+      landmarkerKey = modelKey();
+      return landmarker;
+    } catch (err) {
+      // No WebGL for Jeeliz: fall back to turbo.
+      console.error(err);
+      liteFailed = true;
+    }
+  }
   const tf = window.tf;
   let ok = false;
   for (const name of ["webgpu", "webgl", "cpu"]) {
@@ -311,7 +338,7 @@ const loadModel = async () => {
     if (ok) { backendName = name; break; }
   }
   const detectorModelUrl = new URL("vendor/tfjs/detector/model.json", location.href).href;
-  if (detectLevel().fast) {
+  if (detectLevel().fast || detectLevel().lite) {
     const fd = window.faceDetection;
     landmarker = await fd.createDetector(fd.SupportedModels.MediaPipeFaceDetector, {
       runtime: "tfjs",
@@ -335,6 +362,89 @@ const loadModel = async () => {
   return landmarker;
 };
 
+// ---- Lite tracker (Jeeliz FaceFilter, Apache-2.0) ----
+// It runs its own WebGL loop on a small hidden canvas the shape of the video
+// and reports a square head box (x, y in -1..1 with y up, s = width) plus
+// head rotation and 4 expressions (0 = mouth open). We turn each box into
+// the same 6 points BlazeFace gives, so `fastFaceInfo` can place items.
+const liteCanvas = document.createElement("canvas");
+let liteFailed = false;
+const LITE_WIDTH = 320;
+const liteToPoints = (st, w, h) => {
+  const size = st.s * w;
+  const cx = (0.5 + 0.5 * st.x) * w;
+  const cy = (0.5 - 0.5 * st.y) * h;
+  const a = -st.rz;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  // Face proportions inside the box, in box widths (x right, y down).
+  const at = (dx, dy) => ({ x: cx + (dx * cos - dy * sin) * size, y: cy + (dx * sin + dy * cos) * size });
+  const turn = Math.max(-0.12, Math.min(0.12, -st.ry * 0.15));
+  return [at(-0.19 + turn, -0.08), at(0.19 + turn, -0.08), at(turn * 1.5, 0.1), at(turn, 0.26), at(-0.45, 0), at(0.45, 0)];
+};
+const startLite = (faces) => new Promise((resolve, reject) => {
+  const vw = video.videoWidth || 640;
+  const vh = video.videoHeight || 480;
+  liteCanvas.width = LITE_WIDTH;
+  liteCanvas.height = Math.round(LITE_WIDTH * vh / vw);
+  const ff = JEELIZFACEFILTER.create_new();
+  const tracker = {
+    lite: true,
+    states: [],
+    dispose: () => ff.destroy()
+  };
+  ff.init({
+    canvas: liteCanvas,
+    NNCPath: new URL("vendor/jeeliz/NN_4EXPR_1.json", location.href).href,
+    maxFacesDetected: faces,
+    followZRot: true,
+    videoSettings: { videoElement: video },
+    callbackReady: (err) => {
+      if (err) { reject(new Error("Lite tracker: " + err)); return; }
+      resolve(tracker);
+    },
+    callbackTrack: (state) => {
+      const list = Array.isArray(state) ? state : [state];
+      const w = liteCanvas.width;
+      const h = liteCanvas.height;
+      lastDetectScale = (video.videoWidth || w) / w;
+      lastResult = list
+        .filter((st) => st.detected > 0.7)
+        .map((st) => ({ keypoints: liteToPoints(st, w, h), fast: true, mouthOpen: Math.min(1, st.expressions[0] * 1.3) }));
+      resultFresh = true;
+      noteSpeed();
+    }
+  });
+});
+
+// Auto mode: measure how often results arrive and step down a level when
+// tracking runs at under ~6 updates a second for a few seconds.
+let speedSince = 0;
+let speedCount = 0;
+const noteSpeed = () => {
+  const now = performance.now();
+  if (!speedSince) speedSince = now;
+  speedCount++;
+  const span = now - speedSince;
+  if (span < 3000) return;
+  const rate = (speedCount * 1000) / span;
+  speedSince = now;
+  speedCount = 0;
+  if (settings.detect !== "auto" || rate >= 6) return;
+  const current = AUTO_STEPS.indexOf(autoPick());
+  if (current < AUTO_STEPS.length - 1) {
+    autoFloor = current + 1;
+    reloadModel();
+  }
+};
+const reloadModel = async () => {
+  try {
+    while (busy) await new Promise((res) => setTimeout(res, 20));
+    lastResult = null;
+    await loadModel();
+  } catch (err) { console.error(err); }
+};
+
 // Show the camera at full quality, but run detection on a smaller copy:
 // the face models work at 128-192 px anyway, so this keeps tracking fast.
 const detectCanvas = document.createElement("canvas");
@@ -343,7 +453,7 @@ let lastDetectScale = 1;
 let busy = false;
 let lastDetectAt = 0;
 const track = async () => {
-  if (busy || !landmarker || video.currentTime === lastVideoTime) return;
+  if (busy || !landmarker || landmarker.lite || video.currentTime === lastVideoTime) return;
   const level = detectLevel();
   const now = performance.now();
   if (now - lastDetectAt < level.gap) return;
@@ -365,12 +475,15 @@ const track = async () => {
     const model = landmarker;
     const faces = await model.estimateFaces(detectCanvas, { flipHorizontal: false });
     lastDetectScale = 1 / ratio;
+    if (model !== landmarker) return;
     lastResult = faces.map((face) => ({ keypoints: face.keypoints, fast: !!model.fast }));
     resultFresh = true;
+    noteSpeed();
   } catch (err) {
     console.error(err);
+  } finally {
+    busy = false;
   }
-  busy = false;
 };
 
 // The face library sizes frames from the width/height attributes, not videoWidth.
@@ -391,6 +504,11 @@ const startCamera = async () => {
   await video.play();
   syncVideoSize();
   lastVideoTime = -1;
+  // Jeeliz keeps the old video size; restart it for the new stream.
+  if (landmarker && landmarker.lite) {
+    landmarkerKey = "";
+    await reloadModel();
+  }
 };
 
 const start = async () => {
@@ -427,11 +545,11 @@ const renderQuality = () => {
   [["image", "#imageLevels"], ["detect", "#detectLevels"]].forEach(([key, sel]) => {
     const box = $(sel);
     box.innerHTML = "";
-    const names = key === "detect" ? { ...LEVEL_NAMES, turbo: "⚡ Turbo" } : LEVEL_NAMES;
+    const names = key === "detect" ? { ...LEVEL_NAMES, turbo: "⚡ Turbo", lite: "🪶 Lite" } : LEVEL_NAMES;
     Object.entries(names).forEach(([level, label]) => {
       const btn = document.createElement("button");
       btn.className = "level-btn" + (settings[key] === level ? " on" : "");
-      const auto = key === "detect" ? autoDetect() : autoLevel();
+      const auto = key === "detect" ? autoPick() : autoLevel();
       btn.textContent = level === "auto" ? `${label} (${auto})` : label;
       btn.onclick = () => setQuality(key, level);
       box.appendChild(btn);
@@ -441,15 +559,13 @@ const renderQuality = () => {
 const setQuality = async (key, level) => {
   if (settings[key] === level) return;
   settings[key] = level;
+  if (key === "detect") autoFloor = 0;
   persist();
   play("pop");
   renderQuality();
   try {
     if (key === "image" && stream) await startCamera();
-    if (key === "detect" && landmarker) {
-      while (busy) await new Promise((res) => setTimeout(res, 20));
-      await loadModel();
-    }
+    if (key === "detect" && landmarker) await reloadModel();
   } catch (err) { console.error(err); }
 };
 $("#qualityBtn").onclick = () => { renderQuality(); qualityBox.hidden = false; play("pop"); };
@@ -664,7 +780,11 @@ const loop = (now) => {
   };
   if (resultFresh) {
     resultFresh = false;
-    updateTracks((lastResult || []).map((face) => (face.fast ? fastFaceInfo : faceInfo)(face.keypoints, map)), now);
+    updateTracks((lastResult || []).map((face) => {
+      const info = (face.fast ? fastFaceInfo : faceInfo)(face.keypoints, map);
+      if (face.mouthOpen != null) info.mouthOpen = face.mouthOpen;
+      return info;
+    }), now);
   } else {
     updateTracks([], now);
   }
