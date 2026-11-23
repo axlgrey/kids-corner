@@ -59,6 +59,36 @@ scene.add(moonLight);
 const torch = new THREE.SpotLight(0xfff1c1, 40, 14, 0.4, 0.35, 1);
 torch.position.set(0.12, -0.15, 0);
 camera.add(torch);
+// Visible beam: a soft additive cone from the torch toward the screen centre.
+const beamGeo = new THREE.ConeGeometry(1, 1, 32, 1, true);
+beamGeo.translate(0, -0.5, 0);
+beamGeo.rotateX(-Math.PI / 2);
+const beamMat = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  side: THREE.DoubleSide,
+  fog: false,
+  uniforms: { strength: { value: 0.12 } },
+  vertexShader: `varying float vAlong; varying vec3 vN; varying vec3 vV;
+    void main() {
+      vAlong = position.z;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vN = normalize(normalMatrix * normal);
+      vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: `uniform float strength; varying float vAlong; varying vec3 vN; varying vec3 vV;
+    void main() {
+      float edge = pow(abs(dot(vN, vV)), 1.5);
+      float fade = smoothstep(0.0, 0.08, vAlong) * (1.0 - smoothstep(0.2, 1.0, vAlong));
+      gl_FragColor = vec4(1.0, 0.94, 0.7, strength * edge * fade);
+    }`
+});
+const beamRay = new THREE.Mesh(beamGeo, beamMat);
+beamRay.position.copy(torch.position);
+beamRay.renderOrder = 10;
+camera.add(beamRay);
 const torchTarget = new THREE.Object3D();
 torchTarget.position.set(0, 0, -1);
 camera.add(torchTarget);
@@ -343,7 +373,13 @@ const putAt = (a, s) => {
   facePlayer(obj);
   obj.scale.setScalar(s.size * (a.animal.id === "bear" ? 1 : 1.15));
   a.hideY = s.pos.y - (s.peek || 0) * 0.6;
-  a.showY = s.pos.y;
+  // Peeking animals pop up above (and a little beside) their cover when lit.
+  a.showY = s.pos.y + (s.peek ? 0.45 : 0);
+  a.homeX = obj.position.x;
+  a.homeZ = obj.position.z;
+  const side = new THREE.Vector3(EYE.z - s.pos.z, 0, s.pos.x - EYE.x).setLength(s.peek ? 0.35 * (Math.random() < 0.5 ? -1 : 1) : 0);
+  a.sideX = side.x;
+  a.sideZ = side.z;
   a.up = s.peek ? 0 : 1;
   obj.position.y = s.peek ? a.hideY : a.showY;
   obj.userData.base = null;
@@ -387,6 +423,8 @@ const surprise = (a, big = true) => {
   const { obj, animal } = a;
   a.surprise = 1.2;
   a.up = 1;
+  obj.position.set(a.homeX + a.sideX, a.showY, a.homeZ + a.sideZ);
+  obj.userData.base = null;
   Sfx.play(big ? "gasp" : animal.sound, panOf(obj));
   if (big) setTimeout(() => Sfx.play(animal.sound, panOf(obj)), 220);
   const p = toScreen(obj);
@@ -487,6 +525,8 @@ const idleAnimals = (dt, time) => {
       a.up += (want - a.up) * Math.min(1, dt * 6);
     }
     obj.position.y = a.hideY + (a.showY - a.hideY) * a.up;
+    obj.position.x = a.homeX + a.sideX * a.up;
+    obj.position.z = a.homeZ + a.sideZ * a.up;
     const breathe = 1 + Math.sin(time * 2.5 + a.phase) * 0.025;
     const s = a.spot.size * (a.animal.id === "bear" ? 1 : 1.15);
     obj.scale.set(s, s * breathe, s);
@@ -604,6 +644,12 @@ $("#torchBtn").onclick = () => {
 
 const setBeam = (angle) => {
   torch.angle = angle * 1.2;
+  const len = 9;
+  const tip = Math.tan(angle) * len;
+  beamRay.scale.set(tip, tip, len);
+  // Aim from the torch (lower right) at the point the screen centre looks at.
+  beamRay.lookAt(camera.localToWorld(new THREE.Vector3(0, 0, -6)));
+  beamRay.visible = torchOn;
   const r = Math.tan(angle) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   const rect = canvas.getBoundingClientRect();
   $("#beam").style.setProperty("--r", `${Math.round(r * rect.height / 2)}px`);
