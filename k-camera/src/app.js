@@ -14,7 +14,7 @@ const IMAGE_LEVELS = {
   high:   { w: 1280, h: 720, dpr: 2 }
 };
 // turbo: BlazeFace only (6 points, no face mesh), several times faster on
-// weak phones; anchors are estimated, mouth-open "wow" is off.
+// weak phones; anchors are estimated, mouth-open is guessed (sampleMouth).
 const DETECT_LEVELS = {
   turbo:  { width: 320, faces: 2, gap: 0, fast: true },
   low:    { width: 320, faces: 1, gap: 120 },
@@ -637,6 +637,8 @@ const fastFaceInfo = (marks, map) => {
     unit,
     angle,
     mouthOpen: 0,
+    fast: true,
+    mouthDrop: dist(nose, mouth) / unit,
     eyes,
     nose,
     lip: mid(along(mouth, -0.12), nose),
@@ -727,6 +729,48 @@ const sampleSkin = (toVideo, now) => {
   }
 };
 
+// Turbo mode has no lip points, so mouth-open is guessed from two cues,
+// each compared with that face's own closed-mouth baseline:
+// - the mouth point moves down from the nose when the jaw drops;
+// - an open mouth is a dark hole, so the mouth area gets darker than the
+//   cheeks (read from the small detection copy).
+const lumaOf = (c) => 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2];
+const follow = (base, value, closedIsLow) => {
+  if (base == null) return value;
+  const closer = closedIsLow ? value < base : value > base;
+  return base + (value - base) * (closer ? 0.2 : 0.01);
+};
+let lastMouthSample = 0;
+const sampleMouth = (toVideo, now) => {
+  if (now - lastMouthSample < 60 || !detectCanvas.width) return;
+  lastMouthSample = now;
+  for (const track of tracks) {
+    const f = track.face;
+    if (!f.fast || !track.live) continue;
+    track.dropBase = follow(track.dropBase, f.mouthDrop, true);
+    const drop = Math.max(0, Math.min(1, (f.mouthDrop - track.dropBase) / 0.12));
+    let dark = 0;
+    if (track.skin) {
+      const p = toVideo({ x: f.mouth.x - Math.sin(f.angle) * f.unit * 0.06, y: f.mouth.y + Math.cos(f.angle) * f.unit * 0.06 });
+      const w = Math.max(2, Math.round(p.unit * f.unit * 0.3));
+      const h = Math.max(2, Math.round(p.unit * f.unit * 0.18));
+      try {
+        const data = detectCtx.getImageData(Math.round(p.x - w / 2), Math.round(p.y - h / 2), w, h).data;
+        let sum = 0;
+        for (let i = 0; i < data.length; i += 4) sum += lumaOf([data[i], data[i + 1], data[i + 2]]);
+        const ratio = sum / (data.length / 4) / Math.max(1, lumaOf(track.skin));
+        track.darkBase = follow(track.darkBase, ratio, false);
+        dark = Math.max(0, Math.min(1, (track.darkBase - ratio) / 0.3));
+      } catch {}
+    }
+    const score = Math.min(1, dark * 0.7 + drop * 0.6);
+    // Darkness alone (lighting change, mustache) is not enough: it needs
+    // at least a small jaw drop to count as open.
+    const gated = drop > 0.15 ? score : score * 0.3;
+    track.openScore = (track.openScore || 0) + (gated - (track.openScore || 0)) * 0.5;
+  }
+};
+
 const ANCHOR_SHIFT = { top: -0.25, lip: 0.15, chin: -0.1 };
 
 const drawItems = (face, dpr, now, alpha = 1) => {
@@ -797,9 +841,11 @@ const loop = (now) => {
     return { x: (x - ox) * k, y: (pt.y - oy) * k, unit: k };
   };
   sampleSkin(toVideo, now);
+  sampleMouth(toVideo, now);
 
   tracks.forEach((track, i) => {
     track.face.skin = track.skin;
+    if (track.face.fast) track.face.mouthOpen = track.openScore || 0;
     drawItems(track.face, dpr, now, track.alpha);
     // Only fire "wow" on a steady face; masks make mouth points jumpy.
     const open = track.live && now - track.born > 500 && track.face.mouthOpen > 0.75;
