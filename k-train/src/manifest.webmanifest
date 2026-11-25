@@ -1,0 +1,16 @@
+{
+  "name": "Train Town!",
+  "short_name": "Train Town",
+  "description": "A kid-friendly 3D toy town. Drive a cheeky blue engine, toot the whistle, and bump into things.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#9be7ff",
+  "theme_color": "#2a6fdb",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

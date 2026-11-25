@@ -17,6 +17,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 - Silly Faces!: <https://axlgrey.github.io/kids-corner/k-camera/src/>
 - Spot It!: <https://axlgrey.github.io/kids-corner/k-diff/src/>
 - Torch Night!: <https://axlgrey.github.io/kids-corner/k-torch/src/>
+- Train Town!: <https://axlgrey.github.io/kids-corner/k-train/src/>
 
 ## Apps
 
@@ -33,6 +34,7 @@ Live site: <https://axlgrey.github.io/kids-corner/>
 | Silly Faces! | [`k-camera/src/`](k-camera/src/) | A camera that puts glasses, clown noses, sleepy eyes and more on every face. |
 | Spot It! | [`k-diff/src/`](k-diff/src/) | A spot-the-difference game with silly sounds and animations. |
 | Torch Night! | [`k-torch/src/`](k-torch/src/) | A 3D torchlight game: shine a torch around a night garden and surprise the animals. |
+| Train Town! | [`k-train/src/`](k-train/src/) | A 3D toy town: drive a cheeky blue engine, toot the whistle and bump into things. |
 
 ## Balloon Pop!
 
@@ -274,6 +276,32 @@ Themes and change types live in `k-diff/src/data.js`; bump `VERSION` in
 
 Animals live in `k-torch/src/animals.js` and the garden in
 `k-torch/src/world.js`; bump `VERSION` in `k-torch/src/sw.js` after
+changing them.
+
+## Train Town!
+
+- A 3D toy town: drive a cheeky blue tank engine with a smiley face around
+  a railway loop with roads, traffic lights, level crossings, a station,
+  houses, a park with a fountain, a pond, a farm and a windmill.
+- Speed buttons (reverse, stop, slow, normal, fast), a stop button and a
+  whistle that puffs steam and makes nearby people and animals jump.
+- The train knocks people, animals, cars and toys flying with funny
+  reactions. Drop toys (crates, balls, hay bales, pumpkins, snowmen,
+  blocks) on the track ahead, or tap the track to drop one there.
+- People walk and wave, cars stop at red lights and closed crossings, and
+  animals wander around. Almost everything is tappable: doors, mailboxes,
+  trees, the fountain, hydrants, the windmill and the station bell.
+- Stop at the station for a welcome party.
+- Follow, cab and whole-town cameras (drag to look, pinch or wheel to
+  zoom), day/night with glowing windows and a headlight, and a sound
+  toggle. Keys: arrows or `W`/`S` speed, `Space` whistle, `B` drop toy,
+  `C` camera, `N` night.
+- All models are built from three.js shapes and all sounds are generated
+  in the browser; the only asset is three.js in `k-train/src/vendor/`.
+- Works fully offline as a PWA.
+
+The town and train live in `k-train/src/app.js` and the railway in
+`k-train/src/track.js`; bump `VERSION` in `k-train/src/sw.js` after
 changing them.
 
 ## Adding a New App
